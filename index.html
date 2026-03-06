@@ -209,7 +209,7 @@
                             <span class="w-2 h-2 rounded-full bg-orange-500 z-10"></span>
                             <span class="absolute w-4 h-4 rounded-full bg-orange-500/30 ripple"></span>
                         </div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700">6 Semaines de Série 🔥</p>
+                        <p id="header-streak" class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700">6 Semaines de Série 🔥</p>
                     </div>
                     <h1 class="text-3xl font-serif font-black tracking-tighter text-emerald-950 leading-none">FLANR</h1>
                 </div>
@@ -218,7 +218,7 @@
                         <i data-lucide="award" class="w-5 h-5 text-emerald-700"></i>
                     </button>
                     <button class="w-10 h-10 rounded-full border-2 border-white shadow-md overflow-hidden bg-stone-200" onclick="showPage('profile')">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profil">
+                        <img id="header-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profil">
                     </button>
                 </div>
             </div>
@@ -383,23 +383,23 @@
             <div class="flex flex-col items-center text-center mb-10">
                 <div class="relative">
                     <div class="w-28 h-28 rounded-full border-4 border-emerald-100 p-1 mb-4 shadow-xl">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" class="w-full h-full rounded-full bg-stone-100">
+                        <img id="profile-avatar-img" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" class="w-full h-full rounded-full bg-stone-100">
                     </div>
                     <div class="absolute bottom-4 right-0 bg-orange-500 text-white w-10 h-10 rounded-full border-4 border-[#FDFCF8] flex items-center justify-center shadow-lg streak-fire animate-float">
                         <i data-lucide="flame" class="w-5 h-5 fill-current"></i>
                     </div>
                 </div>
-                <h2 class="text-2xl font-serif font-black text-stone-900">Félix l'Explorateur</h2>
-                <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-[0.2em] mb-6">Expert Flâneur • Niveau 14</p>
+                <h2 id="profile-name" class="text-2xl font-serif font-black text-stone-900">Félix l'Explorateur</h2>
+                <p id="profile-level" class="text-[10px] font-extrabold text-stone-400 uppercase tracking-[0.2em] mb-6">Expert Flâneur • Niveau 14</p>
                 
                 <!-- Barre de Niveau -->
                 <div class="w-full max-w-[200px] mb-8">
                     <div class="flex justify-between text-[8px] font-black uppercase text-emerald-800 mb-1">
-                        <span>XP : 1240</span>
+                        <span id="profile-xp">XP : 1240</span>
                         <span>Niv. 15 : 1500</span>
                     </div>
                     <div class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                        <div class="w-[82%] h-full bg-emerald-600 rounded-full"></div>
+                        <div id="profile-xp-bar" class="w-[82%] h-full bg-emerald-600 rounded-full"></div>
                     </div>
                 </div>
 
@@ -1196,35 +1196,47 @@
         function applyProfileToApp() {
             if (!userProfile) return;
 
-            // Avatar dans le header
             const avatarSrc = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (userProfile.avatar_seed || 'Felix');
-            document.querySelectorAll('img[alt="Profil"], img[alt="Felix"]').forEach(img => {
-                img.src = avatarSrc;
-            });
 
-            // Streak dans le header
-            const streakEl = document.querySelector('.text-orange-700');
-            if (streakEl && userProfile.streak_days !== undefined) {
+            // Avatar header
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar) headerAvatar.src = avatarSrc;
+
+            // Avatar profil
+            const profileAvatarImg = document.getElementById('profile-avatar-img');
+            if (profileAvatarImg) profileAvatarImg.src = avatarSrc;
+
+            // Streak header
+            const streakEl = document.getElementById('header-streak');
+            if (streakEl) {
                 const s = userProfile.streak_days || 0;
                 streakEl.innerHTML = s + ' Jour' + (s > 1 ? 's' : '') + ' de Serie &#x1F525;';
             }
 
-            // Profil page
-            const nameEl = document.querySelector('#page-profile h2.font-serif');
+            // Nom profil
+            const nameEl = document.getElementById('profile-name');
             if (nameEl) nameEl.innerText = userProfile.pseudo || 'Flaneur';
 
-            const levelEl = document.querySelector('#page-profile p.text-stone-400');
+            // Niveau profil
+            const levelEl = document.getElementById('profile-level');
             if (levelEl) {
-                const xp = userProfile.xp || 0;
-                const level = getLevel(xp);
-                levelEl.innerText = level.title + ' - Niveau ' + level.num;
+                const level = getLevel(userProfile.xp || 0);
+                levelEl.innerText = level.title + ' • Niveau ' + level.num;
             }
 
-            // XP bar
-            const xpEl = document.querySelector('#page-profile .font-black.text-stone-900, span[id="xp-val"]');
+            // XP
+            const xpEl = document.getElementById('profile-xp');
             if (xpEl) xpEl.innerText = 'XP : ' + (userProfile.xp || 0);
 
-            // Bouton deconnexion dans le profil
+            // XP bar
+            const xpBar = document.getElementById('profile-xp-bar');
+            if (xpBar) {
+                const xp = userProfile.xp || 0;
+                const pct = Math.min(100, Math.round((xp % 500) / 500 * 100));
+                xpBar.style.width = pct + '%';
+            }
+
+            // Bouton deconnexion
             const profileStats = document.querySelector('#page-profile .space-y-4');
             if (profileStats && !document.getElementById('logout-btn-profile')) {
                 const logoutDiv = document.createElement('div');

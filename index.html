@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Flanr - L'expérience urbaine ultime</title>
+    <!-- Preconnect : évite le blocage du rendu par Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Ajout du SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Ajout de Leaflet pour la carte -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,900;1,8..60,600;1,8..60,900&display=swap" rel="stylesheet">
@@ -22,25 +23,25 @@
         .font-serif { font-family: 'Source Serif 4', serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
+
         /* Navigation (Pages) */
         .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease-out; }
         .page.active { display: block; opacity: 1; transform: translateY(0); }
-        
+
         /* Modal Log Drawer */
         .log-modal {
             transform: translateY(100%);
             transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
         }
         .log-modal.active { transform: translateY(0); }
-        
+
         /* Navigation active state */
         .tab-active { color: #064e3b; }
         .tab-active i { stroke-width: 3px; transform: scale(1.1); }
 
         /* Effets visuels */
         .streak-fire { filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.4)); }
-        
+
         @keyframes float {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
@@ -53,7 +54,7 @@
         }
         .ripple { animation: ripple 2s infinite; }
 
-        /* Toasts (Notifications) */
+        /* Toasts */
         .toast {
             position: fixed;
             top: 20px;
@@ -73,12 +74,9 @@
             box-shadow: 0 10px 30px rgba(6, 78, 59, 0.3);
             pointer-events: none;
         }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* Style popup de la carte */
+        /* Popup carte */
         .leaflet-popup-content-wrapper { border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .leaflet-popup-content { font-family: 'Plus Jakarta Sans', sans-serif; margin: 12px; }
 
@@ -91,11 +89,9 @@
             overflow: hidden;
         }
         #auth-wall.hidden { display: none; }
-
         .auth-screen { display: none; flex-direction: column; height: 100%; }
         .auth-screen.active { display: flex; }
 
-        /* Onboarding steps */
         #onboarding-wall {
             position: fixed; inset: 0; z-index: 9998;
             background: #FDFCF8;
@@ -104,11 +100,9 @@
             overflow: hidden;
         }
         #onboarding-wall.active { display: flex; }
-
         .onboarding-step { display: none; flex-direction: column; height: 100%; padding: 0; }
         .onboarding-step.active { display: flex; }
 
-        /* Chips sélectionnables */
         .vibe-chip {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 10px 16px; border-radius: 100px;
@@ -117,12 +111,8 @@
             cursor: pointer; transition: all 0.2s; color: #78716c;
             user-select: none; -webkit-tap-highlight-color: transparent;
         }
-        .vibe-chip.selected {
-            border-color: #064e3b; background: #064e3b; color: white;
-        }
-        .vibe-chip.selected .chip-emoji { filter: none; }
+        .vibe-chip.selected { border-color: #064e3b; background: #064e3b; color: white; }
 
-        /* Input style auth */
         .auth-input {
             width: 100%; padding: 16px 20px;
             background: #f5f5f4; border: 2px solid transparent;
@@ -133,7 +123,6 @@
         .auth-input:focus { background: white; border-color: #064e3b; }
         .auth-input::placeholder { color: #a8a29e; font-weight: 500; }
 
-        /* Bouton primaire auth */
         .auth-btn {
             width: 100%; padding: 18px;
             background: #052e16; color: white;
@@ -156,7 +145,6 @@
         }
         .auth-btn-secondary:active { background: #f5f5f4; }
 
-        /* Progress bar onboarding */
         .ob-progress-bar {
             height: 3px; border-radius: 100px;
             background: #064e3b; transition: width 0.4s cubic-bezier(0.32, 0.72, 0, 1);
@@ -174,7 +162,6 @@
         }
         .fade-in-scale { animation: fadeInScale 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; }
 
-        /* Avatar picker */
         .avatar-option {
             width: 64px; height: 64px; border-radius: 50%;
             border: 3px solid transparent; cursor: pointer;
@@ -183,7 +170,6 @@
         .avatar-option.selected { border-color: #064e3b; box-shadow: 0 0 0 3px rgba(6,78,59,0.2); }
         .avatar-option img { width: 100%; height: 100%; }
 
-        /* Error message */
         .auth-error {
             background: #fef2f2; color: #dc2626;
             padding: 12px 16px; border-radius: 14px;
@@ -191,15 +177,82 @@
             display: none;
         }
         .auth-error.show { display: block; }
+
+        /* Notif badge */
+        .notif-badge {
+            position: absolute; top: -2px; right: -2px;
+            background: #ef4444; color: white;
+            width: 16px; height: 16px;
+            border-radius: 50%; font-size: 8px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #FDFCF8;
+        }
+
+        /* Spot photo card */
+        .spot-photo {
+            width: 100%; height: 120px; object-fit: cover;
+            border-radius: 1.25rem; margin-bottom: 12px;
+        }
+        .spot-photo-placeholder {
+            width: 100%; height: 120px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-radius: 1.25rem; margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Tag pills */
+        .tag-pill {
+            display: inline-flex; align-items: center; gap: 3px;
+            padding: 3px 8px; border-radius: 100px;
+            background: #f5f5f4; color: #78716c;
+            font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+        }
+
+        /* Search results dropdown */
+        #search-results {
+            position: absolute; top: 100%; left: 0; right: 0;
+            background: white; border-radius: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+            z-index: 50; margin-top: 8px;
+            overflow: hidden; display: none;
+        }
+        #search-results.show { display: block; }
+
+        /* Notifications drawer */
+        #notif-drawer {
+            position: fixed; inset: 0;
+            z-index: 500; pointer-events: none;
+        }
+        #notif-drawer.open { pointer-events: all; }
+        #notif-panel {
+            position: absolute; top: 0; right: 0; left: 0;
+            max-width: 448px; margin: 0 auto;
+            background: #FDFCF8; border-radius: 0 0 2.5rem 2.5rem;
+            padding: 80px 24px 32px;
+            transform: translateY(-100%);
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        #notif-drawer.open #notif-panel { transform: translateY(0); }
+        #notif-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.4);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        #notif-drawer.open #notif-backdrop { opacity: 1; }
+
+        /* Rating histogram Letterboxd style */
+        .rating-bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+        .rating-bar-track { flex: 1; height: 4px; background: #f5f5f4; border-radius: 100px; overflow: hidden; }
+        .rating-bar-fill { height: 100%; background: #059669; border-radius: 100px; transition: width 0.6s ease; }
     </style>
 </head>
 <body class="text-stone-900 leading-relaxed overflow-x-hidden selection:bg-emerald-100">
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast">Notification</div>
 
     <div class="max-w-md mx-auto min-h-screen flex flex-col relative shadow-2xl bg-[#FDFCF8] overflow-hidden">
-        
+
         <!-- HEADER GLOBAL -->
         <header class="px-6 pt-12 pb-4 sticky top-0 bg-[#FDFCF8]/90 backdrop-blur-xl z-40 border-b border-stone-100">
             <div class="flex justify-between items-end">
@@ -214,49 +267,57 @@
                     <h1 class="text-3xl font-serif font-black tracking-tighter text-emerald-950 leading-none">FLANR</h1>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="showToast('Vos récompenses arrivent bientôt !')" class="relative w-10 h-10 flex items-center justify-center bg-stone-100 text-stone-600 rounded-full active:scale-90 transition-transform">
-                        <i data-lucide="award" class="w-5 h-5 text-emerald-700"></i>
+                    <!-- Bouton notifications -->
+                    <button onclick="openNotifDrawer()" class="relative w-10 h-10 flex items-center justify-center bg-stone-100 text-stone-600 rounded-full active:scale-90 transition-transform">
+                        <i data-lucide="bell" class="w-5 h-5 text-emerald-700"></i>
+                        <span id="notif-badge" class="notif-badge" style="display:none;">0</span>
                     </button>
                     <button class="w-10 h-10 rounded-full border-2 border-white shadow-md overflow-hidden bg-stone-200" onclick="showPage('profile')">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profil">
+                        <img id="header-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profil">
                     </button>
                 </div>
             </div>
         </header>
 
+        <!-- ============================================================ -->
         <!-- 1. ACCUEIL (FLUX) -->
+        <!-- ============================================================ -->
         <main id="page-home" class="page active px-6 pt-6 pb-40 overflow-y-auto">
-            
-            <!-- Défi Hebdo -->
-            <section class="mb-10 bg-emerald-950 rounded-[2.5rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-900/20">
+
+            <!-- Défi Hebdo (chargé depuis challenges + challenge_progress) -->
+            <section id="challenge-card" class="mb-10 bg-emerald-950 rounded-[2.5rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-900/20">
                 <div class="relative z-10">
                     <div class="flex justify-between items-center mb-4">
                         <span class="px-3 py-1 bg-emerald-800 rounded-full text-[9px] font-black uppercase tracking-[0.2em]">Défi de la Semaine</span>
                         <div class="flex items-center gap-1 text-emerald-400">
                             <i data-lucide="timer" class="w-3 h-3"></i>
-                            <span class="text-[9px] font-bold">2j restants</span>
+                            <span id="challenge-timer" class="text-[9px] font-bold">…</span>
                         </div>
                     </div>
-                    <h3 class="text-xl font-serif font-bold mb-1">Le Tour des Speakeasies</h3>
-                    <p class="text-emerald-300/80 text-[11px] font-medium leading-relaxed mb-5">Découvre 3 bars cachés pour gagner le badge "Ninja de la Nuit".</p>
-                    
+                    <h3 id="challenge-title" class="text-xl font-serif font-bold mb-1">Chargement…</h3>
+                    <p id="challenge-desc" class="text-emerald-300/80 text-[11px] font-medium leading-relaxed mb-5"></p>
                     <div class="flex items-center gap-4">
                         <div class="flex-1 h-2 bg-emerald-900 rounded-full overflow-hidden">
-                            <div class="w-2/3 h-full bg-emerald-400 rounded-full"></div>
+                            <div id="challenge-bar" class="h-full bg-emerald-400 rounded-full transition-all" style="width:0%"></div>
                         </div>
-                        <span class="text-[10px] font-black">2 / 3</span>
+                        <span id="challenge-score" class="text-[10px] font-black">0 / 3</span>
                     </div>
                 </div>
                 <i data-lucide="zap" class="absolute -bottom-6 -right-6 w-32 h-32 text-white/5 rotate-12"></i>
             </section>
 
-            <!-- Barre de Recherche -->
+            <!-- Barre de Recherche (avec résultats réels via search_spots RPC) -->
             <div class="flex gap-2 mb-8">
                 <div class="relative flex-1 group">
-                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 w-5 h-5 group-focus-within:text-emerald-600 transition-colors"></i>
-                    <input type="text" placeholder="Un bar, une expo, une vibe..." class="w-full pl-12 pr-4 py-4 bg-white border border-stone-100 rounded-2xl shadow-sm text-sm font-medium focus:ring-2 focus:ring-emerald-100 outline-none transition-all">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 w-5 h-5 group-focus-within:text-emerald-600 transition-colors z-10"></i>
+                    <input id="search-input" type="text" placeholder="Un bar, une expo, une vibe..."
+                        class="w-full pl-12 pr-4 py-4 bg-white border border-stone-100 rounded-2xl shadow-sm text-sm font-medium focus:ring-2 focus:ring-emerald-100 outline-none transition-all">
+                    <!-- Dropdown résultats -->
+                    <div id="search-results">
+                        <div id="search-results-list" class="max-h-64 overflow-y-auto"></div>
+                    </div>
                 </div>
-                <button onclick="showToast('Mode Découverte activé !')" class="w-14 h-14 flex items-center justify-center bg-stone-900 text-white rounded-2xl shadow-lg active:scale-95 transition-transform">
+                <button onclick="triggerDiscovery()" class="w-14 h-14 flex items-center justify-center bg-stone-900 text-white rounded-2xl shadow-lg active:scale-95 transition-transform">
                     <i data-lucide="sparkles" class="w-6 h-6 animate-pulse"></i>
                 </button>
             </div>
@@ -281,25 +342,33 @@
             </section>
 
             <!-- Flux d'Activités -->
-            <h2 class="text-xl font-serif font-bold text-stone-800 mb-6 px-2 italic underline decoration-emerald-200 decoration-4 underline-offset-4">Journal de Bord</h2>
-            
+            <h2 id="feed-title" class="text-xl font-serif font-bold text-stone-800 mb-6 px-2 italic underline decoration-emerald-200 decoration-4 underline-offset-4">Pour toi ce soir ✨</h2>
+
             <div id="activity-feed" class="space-y-6">
-                <!-- Les cartes Supabase s'afficheront ici -->
-                <p class="text-sm text-stone-400 text-center italic py-10">Chargement des spots...</p>
+                <p class="text-sm text-stone-400 text-center italic py-10">Chargement des spots…</p>
             </div>
-            
+
+            <!-- Load More -->
+            <div id="load-more-wrap" class="pt-6 pb-2 flex justify-center" style="display:none!important">
+                <button onclick="loadMoreSpots()" class="px-8 py-3 border-2 border-stone-200 text-stone-500 text-[10px] font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-transform">
+                    Voir plus
+                </button>
+            </div>
+
         </main>
 
+        <!-- ============================================================ -->
         <!-- 2. EXPLORER / MAP -->
+        <!-- ============================================================ -->
         <main id="page-explore" class="page px-6 pt-6 pb-40 overflow-y-auto">
             <h2 class="text-2xl font-serif font-black text-emerald-950 mb-2 italic">Explorer Paris</h2>
             <p class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-8">Découvre ta prochaine obsession</p>
-            
+
             <!-- La Carte Interactive -->
             <div class="mb-8 rounded-[2rem] overflow-hidden border border-stone-200 shadow-sm relative z-0 h-72 bg-stone-100">
                 <div id="map" class="w-full h-full"></div>
             </div>
-            
+
             <!-- Quêtes de Proximité -->
             <div class="mb-10">
                 <h3 class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-4 flex items-center gap-2">
@@ -317,34 +386,36 @@
 
             <!-- Catégories Grille -->
             <div class="grid grid-cols-2 gap-4">
-                <div onclick="showToast('Recherche autour de vous...')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-emerald-50 transition-colors cursor-pointer">
+                <div onclick="filterMapByCategory(null)" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-emerald-50 transition-colors cursor-pointer">
                     <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 mb-3">
                         <i data-lucide="navigation-2" class="w-6 h-6"></i>
                     </div>
                     <span class="text-[10px] font-black uppercase tracking-widest text-stone-800">Autour de moi</span>
                 </div>
-                <div onclick="showToast('Catégorie Cafés sélectionnée')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-orange-50 transition-colors cursor-pointer">
+                <div onclick="filterMapByCategory('Cafe')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-orange-50 transition-colors cursor-pointer">
                     <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 mb-3">
                         <i data-lucide="coffee" class="w-6 h-6"></i>
                     </div>
                     <span class="text-[10px] font-black uppercase tracking-widest text-stone-800">Cafés & Co</span>
                 </div>
-                <div onclick="showToast('Catégorie Dates sélectionnée')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-rose-50 transition-colors cursor-pointer">
+                <div onclick="filterMapByCategory('Restaurant')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-rose-50 transition-colors cursor-pointer">
                     <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-700 mb-3">
                         <i data-lucide="heart" class="w-6 h-6"></i>
                     </div>
                     <span class="text-[10px] font-black uppercase tracking-widest text-stone-800">Dates Idéaux</span>
                 </div>
-                <div onclick="showToast('Chargement de la Carte Interactive...')" class="p-6 bg-stone-900 border border-stone-800 rounded-3xl flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition-transform cursor-pointer">
+                <div onclick="filterMapByCategory('Bar')" class="p-6 bg-stone-900 border border-stone-800 rounded-3xl flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition-transform cursor-pointer">
                     <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-stone-900 mb-3 animate-pulse">
                         <i data-lucide="map" class="w-6 h-6"></i>
                     </div>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-white">Carte Live</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-white">Bars & Nuit</span>
                 </div>
             </div>
         </main>
 
+        <!-- ============================================================ -->
         <!-- 3. LISTES -->
+        <!-- ============================================================ -->
         <main id="page-listes" class="page px-6 pt-6 pb-40 overflow-y-auto">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-serif font-black text-emerald-950 italic">Mes Listes</h2>
@@ -380,7 +451,7 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Nom de la liste</label>
-                        <input id="new-list-name" type="text" placeholder="Ex: Terrasses secrètes..." class="w-full px-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
+                        <input id="new-list-name" type="text" placeholder="Ex: Terrasses secrètes…" class="w-full px-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Icône</label>
@@ -398,63 +469,72 @@
             </div>
         </div>
 
-        <!-- 4. PROFIL / TROPHÉES -->
+        <!-- ============================================================ -->
+        <!-- 4. PROFIL -->
+        <!-- ============================================================ -->
         <main id="page-profile" class="page px-6 pt-6 pb-40 overflow-y-auto">
             <div class="flex flex-col items-center text-center mb-10">
                 <div class="relative">
                     <div class="w-28 h-28 rounded-full border-4 border-emerald-100 p-1 mb-4 shadow-xl">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" class="w-full h-full rounded-full bg-stone-100">
+                        <img id="profile-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" class="w-full h-full rounded-full bg-stone-100">
                     </div>
                     <div class="absolute bottom-4 right-0 bg-orange-500 text-white w-10 h-10 rounded-full border-4 border-[#FDFCF8] flex items-center justify-center shadow-lg streak-fire animate-float">
                         <i data-lucide="flame" class="w-5 h-5 fill-current"></i>
                     </div>
                 </div>
-                <h2 class="text-2xl font-serif font-black text-stone-900">Félix l'Explorateur</h2>
-                <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-[0.2em] mb-6">Expert Flâneur • Niveau 14</p>
-                
-                <!-- Barre de Niveau -->
-                <div class="w-full max-w-[200px] mb-8">
+                <h2 id="profile-name" class="text-2xl font-serif font-black text-stone-900">Félix</h2>
+                <!-- Bio -->
+                <p id="profile-bio" class="text-xs text-stone-400 font-medium leading-relaxed max-w-[200px] mt-1 mb-2 italic" style="display:none;"></p>
+                <p id="profile-level" class="text-[10px] font-extrabold text-stone-400 uppercase tracking-[0.2em] mb-4">Flaneur • Niveau 1</p>
+
+                <!-- Barre de Niveau (dynamique) -->
+                <div class="w-full max-w-[200px] mb-6">
                     <div class="flex justify-between text-[8px] font-black uppercase text-emerald-800 mb-1">
-                        <span>XP : 1240</span>
-                        <span>Niv. 15 : 1500</span>
+                        <span id="xp-val">XP : 0</span>
+                        <span id="xp-next">Niv. 2 : 100</span>
                     </div>
                     <div class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                        <div class="w-[82%] h-full bg-emerald-600 rounded-full"></div>
+                        <div id="xp-bar" class="h-full bg-emerald-600 rounded-full transition-all duration-700" style="width:0%"></div>
                     </div>
                 </div>
 
-                <div class="flex gap-8 border-y border-stone-100 w-full py-6">
+                <!-- Stats (logs + streak + listes + followers + following) -->
+                <div class="flex gap-6 border-y border-stone-100 w-full py-6">
                     <div class="flex-1 text-center">
                         <p id="stat-spots" class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
                         <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Spots</p>
                     </div>
-                    <div class="flex-1 text-center border-x border-stone-100">
+                    <div class="flex-1 text-center border-l border-stone-100">
                         <p id="stat-streak" class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
                         <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Série</p>
                     </div>
-                    <div class="flex-1 text-center">
+                    <div class="flex-1 text-center border-l border-stone-100">
                         <p id="stat-listes" class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
                         <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Listes</p>
                     </div>
+                    <div class="flex-1 text-center border-l border-stone-100">
+                        <p id="stat-followers" class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
+                        <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Abonnés</p>
+                    </div>
                 </div>
             </div>
-            
+
             <!-- Badges de Spécialiste -->
             <h3 class="text-sm font-black uppercase tracking-[0.2em] text-stone-400 mb-6 px-2 italic">Mes Trophées</h3>
-            <div class="grid grid-cols-3 gap-6 mb-12">
-                <div onclick="showToast('Visite 5 terrasses pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
+            <div id="badges-grid" class="grid grid-cols-3 gap-6 mb-12">
+                <div class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
                     <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center text-stone-400 border border-stone-200">
                         <i data-lucide="sun" class="w-8 h-8"></i>
                     </div>
                     <span class="text-[8px] font-black uppercase text-stone-400">Terrasses</span>
                 </div>
-                <div onclick="showToast('Visite 3 bars de nuit pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
+                <div class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
                     <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center text-stone-400 border border-stone-200">
                         <i data-lucide="moon" class="w-8 h-8"></i>
                     </div>
                     <span class="text-[8px] font-black uppercase text-stone-400">Night Owl</span>
                 </div>
-                <div onclick="showToast('Visite 10 cafés pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
+                <div class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
                     <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center text-stone-400 border border-stone-200">
                         <i data-lucide="coffee" class="w-8 h-8"></i>
                     </div>
@@ -462,7 +542,7 @@
                 </div>
             </div>
 
-            <!-- Stats -->
+            <!-- Stats avancées -->
             <div class="space-y-4" id="profile-stats-section">
                 <div class="p-5 bg-stone-50 border border-stone-100 rounded-3xl flex items-center justify-between">
                     <div class="flex items-center gap-4">
@@ -470,19 +550,33 @@
                             <i data-lucide="trending-up" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <p class="text-xs font-black text-stone-400">Quartier de Prédilection</p>
-                            <p class="text-[10px] font-bold text-stone-300 uppercase tracking-tighter">Commence à explorer !</p>
+                            <p class="text-xs font-black text-stone-700">Catégorie de prédilection</p>
+                            <p id="top-category" class="text-[10px] font-bold text-stone-400 uppercase tracking-tighter">Commence à explorer !</p>
                         </div>
                     </div>
                 </div>
+                <div class="p-5 bg-stone-50 border border-stone-100 rounded-3xl flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                            <i data-lucide="star" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-black text-stone-700">Note moyenne donnée</p>
+                            <p id="avg-rating" class="text-[10px] font-bold text-stone-400 uppercase tracking-tighter">Pas encore noté</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="w-full mt-4 py-4 rounded-3xl border-2 border-rose-100 text-rose-500 text-xs font-black uppercase tracking-widest active:scale-95 transition-transform">Se déconnecter</button>
             </div>
         </main>
 
+        <!-- ============================================================ -->
         <!-- LOG MODAL (Le Formulaire Drawer) -->
+        <!-- ============================================================ -->
         <div id="log-overlay" class="fixed inset-0 bg-stone-950/60 backdrop-blur-sm z-[100] opacity-0 pointer-events-none transition-opacity duration-300">
-            <div id="log-modal" class="log-modal absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-[#FDFCF8] rounded-t-[3rem] p-8 pb-12 shadow-[0_-20px_50px_rgba(0,0,0,0.2)] max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div id="log-modal" class="log-modal absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-[#FDFCF8] rounded-t-[3rem] p-8 pb-12 shadow-[0_-20px_50px_rgba(0,0,0,0.2)] max-h-[92vh] overflow-y-auto no-scrollbar">
                 <div class="w-12 h-1.5 bg-stone-200 rounded-full mx-auto mb-8"></div>
-                
+
                 <div class="flex justify-between items-start mb-8">
                     <div>
                         <h2 class="text-2xl font-serif font-black text-stone-900 leading-none">Immortalisé</h2>
@@ -493,57 +587,71 @@
                     </button>
                 </div>
 
-                <form id="log-form" class="space-y-8 pb-10">
-                    <!-- Lieu & Photo -->
+                <form id="log-form" class="space-y-6 pb-10">
+                    <!-- Lieu -->
                     <div class="flex gap-4">
                         <div class="flex-1">
                             <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 italic">Où as-tu traîné ?</label>
                             <div class="relative">
                                 <i data-lucide="map-pin" class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-700 w-4 h-4"></i>
-                                <input type="text" required placeholder="Nom de l'établissement..." class="w-full pl-10 pr-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
+                                <input id="log-spot-name" type="text" required placeholder="Nom de l'établissement…"
+                                    class="w-full pl-10 pr-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
+                            </div>
+                            <!-- Spot trouvé en base -->
+                            <div id="spot-match-hint" class="mt-2 hidden">
+                                <span class="text-[9px] font-black text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">✓ <span id="spot-match-name"></span> trouvé dans la base</span>
                             </div>
                         </div>
-                        <div onclick="showToast('Ouverture de la galerie photo...')" class="w-24 h-24 bg-stone-100 border-2 border-dashed border-stone-200 rounded-2xl flex flex-col items-center justify-center text-stone-400 active:bg-emerald-50 transition-colors cursor-pointer">
+                        <div onclick="showToast('Upload photo bientôt dispo !')" class="w-24 h-24 bg-stone-100 border-2 border-dashed border-stone-200 rounded-2xl flex flex-col items-center justify-center text-stone-400 active:bg-emerald-50 transition-colors cursor-pointer flex-shrink-0">
                             <i data-lucide="camera" class="w-6 h-6 mb-1"></i>
                             <span class="text-[8px] font-black uppercase">Instant</span>
                         </div>
                     </div>
 
-                    <!-- Note & Ambiance -->
+                    <!-- Note & Budget -->
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-stone-50 p-4 rounded-3xl">
                             <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center">Verdict</label>
                             <div id="log-stars" class="flex justify-center gap-1 cursor-pointer">
-                                <i data-lucide="star" data-val="1" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
-                                <i data-lucide="star" data-val="2" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
-                                <i data-lucide="star" data-val="3" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
-                                <i data-lucide="star" data-val="4" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
+                                <i data-lucide="star" data-val="1" class="w-5 h-5 text-stone-200 star-btn"></i>
+                                <i data-lucide="star" data-val="2" class="w-5 h-5 text-stone-200 star-btn"></i>
+                                <i data-lucide="star" data-val="3" class="w-5 h-5 text-stone-200 star-btn"></i>
+                                <i data-lucide="star" data-val="4" class="w-5 h-5 text-stone-200 star-btn"></i>
                                 <i data-lucide="star" data-val="5" class="w-5 h-5 text-stone-200 star-btn"></i>
                             </div>
                         </div>
                         <div class="bg-stone-50 p-4 rounded-3xl cursor-pointer select-none" onclick="cycleBudget()">
                             <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center cursor-pointer">Budget</label>
                             <div class="flex justify-center gap-2">
-                                <span id="budget-display" class="text-sm font-black text-emerald-950">$$$</span>
+                                <span id="budget-display" class="text-sm font-black text-emerald-950">$$</span>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Critique / Review -->
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 italic">Ta critique</label>
+                        <textarea id="log-review" placeholder="Ambiance, coup de coeur, déception… (optionnel)"
+                            class="w-full px-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-medium focus:ring-2 focus:ring-emerald-200 outline-none resize-none"
+                            rows="3" maxlength="500"></textarea>
                     </div>
 
                     <!-- Must Try -->
                     <div>
                         <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 italic underline decoration-emerald-200">Le Must-Try Absolu</label>
-                        <input type="text" placeholder="Ex: Le Mezcal Tonic..." class="w-full px-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
+                        <input id="log-must-try" type="text" placeholder="Ex: Le Mezcal Tonic…"
+                            class="w-full px-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
                     </div>
 
                     <button type="submit" class="w-full bg-emerald-950 text-white py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-200 active:scale-95 transition-transform">
-                        Journaliser & Gagner de l'XP
+                        Journaliser &amp; Gagner de l'XP
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- TAB BAR (Navigation Mobile en bas) -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-2xl border-t border-stone-100 px-8 py-5 flex justify-between items-center z-[60] rounded-t-[3rem] shadow-[0_-15px_50px_rgba(0,0,0,0.06)] safe-area-bottom">
+        <!-- TAB BAR -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-2xl border-t border-stone-100 px-8 py-5 flex justify-between items-center z-[60] rounded-t-[3rem] shadow-[0_-15px_50px_rgba(0,0,0,0.06)]">
             <button onclick="showPage('home')" class="nav-btn tab-active flex flex-col items-center gap-1.5 transition-all active:scale-90">
                 <i data-lucide="layout-grid" class="w-6 h-6"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.15em]">Flux</span>
@@ -552,14 +660,11 @@
                 <i data-lucide="compass" class="w-6 h-6"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.15em]">Carte</span>
             </button>
-            
-            <!-- Bouton Central "+" -->
             <div class="-mt-20">
                 <button id="open-log" class="bg-emerald-700 text-white p-6 rounded-full shadow-2xl shadow-emerald-200 border-[8px] border-[#FDFCF8] active:scale-90 transition-all">
                     <i data-lucide="plus" class="w-8 h-8 stroke-[3.5px]"></i>
                 </button>
             </div>
-
             <button onclick="showPage('listes')" class="nav-btn flex flex-col items-center gap-1.5 text-stone-300 transition-all active:scale-90">
                 <i data-lucide="layers" class="w-6 h-6"></i>
                 <span class="text-[8px] font-black uppercase tracking-[0.15em]">Listes</span>
@@ -570,59 +675,79 @@
             </button>
         </nav>
 
+    </div><!-- /max-w-md -->
+
+    <!-- ============================================================ -->
+    <!-- NOTIFICATIONS DRAWER -->
+    <!-- ============================================================ -->
+    <div id="notif-drawer">
+        <div id="notif-backdrop" onclick="closeNotifDrawer()"></div>
+        <div id="notif-panel" class="max-w-md mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-serif font-black text-stone-900">Notifications</h3>
+                <button onclick="closeNotifDrawer()" class="w-8 h-8 bg-stone-100 rounded-full flex items-center justify-center active:scale-90 transition-transform">
+                    <i data-lucide="x" class="w-4 h-4 text-stone-500"></i>
+                </button>
+            </div>
+            <div id="notif-list" class="space-y-3 max-h-80 overflow-y-auto no-scrollbar">
+                <p class="text-xs text-stone-400 text-center py-6 italic">Aucune notification pour l'instant</p>
+            </div>
+        </div>
     </div>
 
-    <!-- ===== AUTH WALL ===== -->
+    <!-- ============================================================ -->
+    <!-- AUTH WALL -->
+    <!-- ============================================================ -->
     <div id="auth-wall">
 
-        <!-- ECRAN 1 : LANDING -->
+        <!-- ÉCRAN 1 : LANDING -->
         <div id="auth-landing" class="auth-screen active" style="justify-content:space-between; padding: 0;">
             <div class="relative flex-1 bg-emerald-950 flex flex-col items-center justify-center overflow-hidden" style="min-height: 55vh;">
                 <div class="absolute inset-0" style="background: radial-gradient(ellipse at 30% 50%, rgba(16,185,129,0.15) 0%, transparent 60%);"></div>
-                <div class="absolute top-16 left-8 w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl animate-float" style="animation-delay:0s">&#127863;</div>
-                <div class="absolute top-24 right-10 w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-lg animate-float" style="animation-delay:0.8s">&#9749;</div>
-                <div class="absolute bottom-20 left-12 w-11 h-11 bg-white/5 rounded-2xl flex items-center justify-center text-lg animate-float" style="animation-delay:1.4s">&#127928;</div>
-                <div class="absolute bottom-16 right-8 w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl animate-float" style="animation-delay:0.4s">&#127769;</div>
+                <div class="absolute top-16 left-8 w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl animate-float" style="animation-delay:0s">🍷</div>
+                <div class="absolute top-24 right-10 w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-lg animate-float" style="animation-delay:0.8s">☕</div>
+                <div class="absolute bottom-20 left-12 w-11 h-11 bg-white/5 rounded-2xl flex items-center justify-center text-lg animate-float" style="animation-delay:1.4s">🎵</div>
+                <div class="absolute bottom-16 right-8 w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl animate-float" style="animation-delay:0.4s">🌙</div>
                 <div class="relative z-10 text-center px-8">
                     <div class="flex items-center justify-center gap-3 mb-4">
                         <span class="relative flex items-center justify-center">
                             <span class="w-2 h-2 rounded-full bg-orange-400 z-10"></span>
                             <span class="absolute w-4 h-4 rounded-full bg-orange-400/30 ripple"></span>
                         </span>
-                        <span class="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400 ml-2">Paris &#x2022; Maintenant</span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400 ml-2">Paris • Maintenant</span>
                     </div>
                     <h1 class="text-6xl font-serif font-black text-white tracking-tighter leading-none mb-4">FLANR</h1>
-                    <p class="text-emerald-300/80 text-sm font-medium leading-relaxed">Explore. Log. Deviens une legende de ta ville.</p>
+                    <p class="text-emerald-300/80 text-sm font-medium leading-relaxed">Explore. Log. Deviens une légende de ta ville.</p>
                 </div>
             </div>
             <div class="bg-[#FDFCF8] px-8 pt-8 pb-12 space-y-3">
-                <button class="auth-btn" onclick="showAuthScreen('signup')">Commencer ma flanerie &#x2192;</button>
-                <button class="auth-btn-secondary" onclick="showAuthScreen('login')">J'ai deja un compte</button>
-                <p class="text-center text-[9px] font-bold text-stone-300 uppercase tracking-widest pt-2">Gratuit &#x2022; Sans engagement &#x2022; 100% Paris</p>
+                <button class="auth-btn" onclick="showAuthScreen('signup')">Commencer ma flânerie →</button>
+                <button class="auth-btn-secondary" onclick="showAuthScreen('login')">J'ai déjà un compte</button>
+                <p class="text-center text-[9px] font-bold text-stone-300 uppercase tracking-widest pt-2">Gratuit • Sans engagement • 100% Paris</p>
             </div>
         </div>
 
-        <!-- ECRAN 2 : SIGNUP -->
+        <!-- ÉCRAN 2 : SIGNUP -->
         <div id="auth-signup" class="auth-screen" style="padding: 48px 32px 40px; overflow-y: auto;">
             <button onclick="showAuthScreen('landing')" class="flex items-center gap-2 text-stone-400 mb-8 self-start active:scale-95 transition-transform">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 <span class="text-xs font-black uppercase tracking-widest">Retour</span>
             </button>
             <div class="mb-8">
-                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-none mb-2">Bienvenue,<br>flaneur&#xB7;euse.</h2>
-                <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Cree ton compte en 30 secondes</p>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-none mb-2">Bienvenue,<br>flaneur·euse.</h2>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Crée ton compte en 30 secondes</p>
             </div>
             <div id="signup-error" class="auth-error mb-4"></div>
             <div class="space-y-4 flex-1">
                 <input id="signup-pseudo" class="auth-input" type="text" placeholder="Ton pseudo (ex: NoctambuleParis)" maxlength="30">
                 <input id="signup-email" class="auth-input" type="email" placeholder="Ton email">
                 <input id="signup-password" class="auth-input" type="password" placeholder="Mot de passe (8 car. min)">
-                <button id="signup-btn" class="auth-btn mt-2" onclick="handleSignup()">Creer mon compte &#x1F525;</button>
-                <p class="text-center text-[10px] text-stone-400 font-medium">Deja inscrit&#xB7;e ? <button onclick="showAuthScreen('login')" class="text-emerald-700 font-black underline">Connexion</button></p>
+                <button id="signup-btn" class="auth-btn mt-2" onclick="handleSignup()">Créer mon compte 🔥</button>
+                <p class="text-center text-[10px] text-stone-400 font-medium">Déjà inscrit·e ? <button onclick="showAuthScreen('login')" class="text-emerald-700 font-black underline">Connexion</button></p>
             </div>
         </div>
 
-        <!-- ECRAN 3 : LOGIN -->
+        <!-- ÉCRAN 3 : LOGIN -->
         <div id="auth-login" class="auth-screen" style="padding: 48px 32px 40px; overflow-y: auto;">
             <button onclick="showAuthScreen('landing')" class="flex items-center gap-2 text-stone-400 mb-8 self-start active:scale-95 transition-transform">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
@@ -630,30 +755,31 @@
             </button>
             <div class="mb-8">
                 <h2 class="text-3xl font-serif font-black text-emerald-950 leading-none mb-2">Content de<br>te revoir.</h2>
-                <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Reprends ta flanerie</p>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Reprends ta flânerie</p>
             </div>
             <div id="login-error" class="auth-error mb-4"></div>
             <div class="space-y-4 flex-1">
                 <input id="login-email" class="auth-input" type="email" placeholder="Ton email">
                 <input id="login-password" class="auth-input" type="password" placeholder="Mot de passe">
-                <button id="login-btn" class="auth-btn mt-2" onclick="handleLogin()">Se connecter &#x2192;</button>
+                <button id="login-btn" class="auth-btn mt-2" onclick="handleLogin()">Se connecter →</button>
                 <p class="text-center text-[10px] text-stone-400 font-medium">Pas encore de compte ? <button onclick="showAuthScreen('signup')" class="text-emerald-700 font-black underline">S'inscrire</button></p>
             </div>
         </div>
 
-        <!-- ECRAN 4 : CONFIRM EMAIL -->
+        <!-- ÉCRAN 4 : CONFIRM EMAIL -->
         <div id="auth-confirm" class="auth-screen" style="padding: 48px 32px 40px; justify-content: center; align-items: center; text-align: center;">
-            <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-4xl mb-6">&#x1F4EC;</div>
-            <h2 class="text-2xl font-serif font-black text-emerald-950 mb-3">Verifie tes mails !</h2>
-            <p class="text-sm text-stone-500 font-medium leading-relaxed mb-8">On t'a envoye un lien de confirmation. Clique dessus puis reviens ici.</p>
-            <button class="auth-btn" onclick="showAuthScreen('login')">J'ai confirme, me connecter &#x2192;</button>
+            <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-4xl mb-6">📬</div>
+            <h2 class="text-2xl font-serif font-black text-emerald-950 mb-3">Vérifie tes mails !</h2>
+            <p class="text-sm text-stone-500 font-medium leading-relaxed mb-8">On t'a envoyé un lien de confirmation. Clique dessus puis reviens ici.</p>
+            <button class="auth-btn" onclick="showAuthScreen('login')">J'ai confirmé, me connecter →</button>
         </div>
 
     </div>
 
-    <!-- ===== ONBOARDING WALL ===== -->
+    <!-- ============================================================ -->
+    <!-- ONBOARDING WALL -->
+    <!-- ============================================================ -->
     <div id="onboarding-wall">
-
         <div class="w-full h-1 bg-stone-100 flex-shrink-0">
             <div id="ob-progress" class="ob-progress-bar" style="width: 20%"></div>
         </div>
@@ -661,9 +787,9 @@
         <!-- STEP 1 : Pseudo + Avatar -->
         <div id="ob-step-1" class="onboarding-step active" style="padding: 40px 32px 80px; overflow-y: auto;">
             <div class="mb-8">
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 1 / 5</span>
-                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Ton identite<br>de flaneur&#xB7;euse</h2>
-                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Comment veux-tu apparaitre ?</p>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Étape 1 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Ton identité<br>de flaneur·euse</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Comment veux-tu apparaître ?</p>
             </div>
             <div class="mb-8">
                 <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Choisis ton avatar</label>
@@ -691,7 +817,7 @@
                     <option value="Autre">Autre</option>
                 </select>
             </div>
-            <button class="auth-btn" onclick="obNext(2)">Suivant &#x2192;</button>
+            <button class="auth-btn" onclick="obNext(2)">Suivant →</button>
         </div>
 
         <!-- STEP 2 : Vibes -->
@@ -701,25 +827,25 @@
                 <span class="text-xs font-black uppercase tracking-widest">Retour</span>
             </button>
             <div class="mb-8">
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 2 / 5</span>
-                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Tes vibes,<br>tes regles.</h2>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Étape 2 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Tes vibes,<br>tes règles.</h2>
                 <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Qu'est-ce qui t'attire ? (plusieurs choix)</p>
             </div>
             <div class="flex flex-wrap gap-3" id="vibes-picker">
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="bar">&#x1F378; Bars &amp; Cocktails</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="vin">&#x1F377; Bar a vins</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="restaurant">&#x1F37D; Restos</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="cafe">&#x2615; Cafes</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="brunch">&#x1F951; Brunch</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="rooftop">&#x1F306; Rooftops</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="jazz">&#x1F3B7; Jazz &amp; Live</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="club">&#x1F3A7; Clubs &amp; Nuits</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="culture">&#x1F3A8; Expos &amp; Culture</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="boulangerie">&#x1F950; Boulangeries</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="streetfood">&#x1F32E; Street Food</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="nature">&#x1F33F; Parcs &amp; Plein air</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="bar">🍸 Bars & Cocktails</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="vin">🍷 Bar à vins</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="restaurant">🍽 Restos</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="cafe">☕ Cafés</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="brunch">🥑 Brunch</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="rooftop">🏙 Rooftops</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="jazz">🎷 Jazz & Live</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="club">🎧 Clubs & Nuits</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="culture">🎨 Expos & Culture</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="boulangerie">🥐 Boulangeries</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="streetfood">🌮 Street Food</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="nature">🌿 Parcs & Plein air</div>
             </div>
-            <button class="auth-btn mt-8" onclick="obNext(3)">Suivant &#x2192;</button>
+            <button class="auth-btn mt-8" onclick="obNext(3)">Suivant →</button>
         </div>
 
         <!-- STEP 3 : Budget & Horaires -->
@@ -729,38 +855,38 @@
                 <span class="text-xs font-black uppercase tracking-widest">Retour</span>
             </button>
             <div class="mb-8">
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 3 / 5</span>
-                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Ton style<br>de flanerie.</h2>
-                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Pour des reco ultra-precises</p>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Étape 3 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Ton style<br>de flânerie.</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Pour des reco ultra-précises</p>
             </div>
             <div class="mb-8">
                 <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Ton budget moyen par sortie</label>
                 <div class="flex gap-3 flex-wrap" id="budget-ob-picker">
                     <div class="vibe-chip" onclick="selectSingle(this, 'budget-ob-picker')" data-val="1">$ Petit budget</div>
                     <div class="vibe-chip selected" onclick="selectSingle(this, 'budget-ob-picker')" data-val="2">$$ Moyen</div>
-                    <div class="vibe-chip" onclick="selectSingle(this, 'budget-ob-picker')" data-val="3">$$$ Genereux</div>
+                    <div class="vibe-chip" onclick="selectSingle(this, 'budget-ob-picker')" data-val="3">$$$ Généreux</div>
                 </div>
             </div>
             <div class="mb-8">
-                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Tu sors plutot...</label>
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Tu sors plutôt…</label>
                 <div class="flex flex-wrap gap-3" id="timing-picker">
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="weekend">&#x1F5D3; Week-ends</div>
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="semaine">&#x1F4C5; En semaine</div>
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="aprem">&#x2600; L'apres-midi</div>
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="soir">&#x1F306; Le soir</div>
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="nuit">&#x1F319; La nuit</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="weekend">🗓 Week-ends</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="semaine">📅 En semaine</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="aprem">☀️ L'après-midi</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="soir">🌆 Le soir</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="nuit">🌙 La nuit</div>
                 </div>
             </div>
             <div class="mb-8">
-                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Tu flanes generalement...</label>
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Tu flânes généralement…</label>
                 <div class="flex flex-wrap gap-3" id="company-picker">
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="solo">&#x1F6B6; Solo</div>
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="amis">&#x1F465; Entre amis</div>
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="date">&#x1F491; En date</div>
-                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="collegues">&#x1F4BC; Collegues</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="solo">🚶 Solo</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="amis">👥 Entre amis</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="date">💑 En date</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="collegues">💼 Collègues</div>
                 </div>
             </div>
-            <button class="auth-btn" onclick="obNext(4)">Suivant &#x2192;</button>
+            <button class="auth-btn" onclick="obNext(4)">Suivant →</button>
         </div>
 
         <!-- STEP 4 : Quartiers -->
@@ -770,9 +896,9 @@
                 <span class="text-xs font-black uppercase tracking-widest">Retour</span>
             </button>
             <div class="mb-8">
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 4 / 5</span>
-                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Tes quartiers<br>de coeur.</h2>
-                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Selectionne tes zones (plusieurs ok)</p>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Étape 4 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Tes quartiers<br>de cœur.</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Sélectionne tes zones (plusieurs ok)</p>
             </div>
             <div class="flex flex-wrap gap-3" id="quartiers-picker">
                 <div class="vibe-chip" onclick="toggleChip(this)" data-val="marais">Le Marais</div>
@@ -783,12 +909,12 @@
                 <div class="vibe-chip" onclick="toggleChip(this)" data-val="canal">Canal Saint-Martin</div>
                 <div class="vibe-chip" onclick="toggleChip(this)" data-val="belleville">Belleville</div>
                 <div class="vibe-chip" onclick="toggleChip(this)" data-val="pigalle">Pigalle / SoPi</div>
-                <div class="vibe-chip" onclick="toggleChip(this)" data-val="republique">Republique</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="republique">République</div>
                 <div class="vibe-chip" onclick="toggleChip(this)" data-val="latin">Quartier Latin</div>
                 <div class="vibe-chip" onclick="toggleChip(this)" data-val="batignolles">Batignolles</div>
                 <div class="vibe-chip" onclick="toggleChip(this)" data-val="nation">Nation</div>
             </div>
-            <button class="auth-btn mt-8" onclick="obNext(5)">Suivant &#x2192;</button>
+            <button class="auth-btn mt-8" onclick="obNext(5)">Suivant →</button>
         </div>
 
         <!-- STEP 5 : Persona -->
@@ -798,850 +924,1131 @@
                 <span class="text-xs font-black uppercase tracking-widest">Retour</span>
             </button>
             <div class="mb-8">
-                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 5 / 5</span>
-                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Derniere<br>question.</h2>
-                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Qu'est-ce qui decrit le mieux ta vibe ?</p>
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Étape 5 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Dernière<br>question.</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Qu'est-ce qui décrit le mieux ta vibe ?</p>
             </div>
             <div class="space-y-3 mb-8" id="persona-picker">
                 <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="explorateur">
-                    <span class="text-2xl mr-3">&#x1F5FA;</span>
+                    <span class="text-2xl mr-3">🗺</span>
                     <div><div class="text-sm font-black">L'Explorateur</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Je cherche toujours le spot que personne ne connait encore</div></div>
                 </div>
                 <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="epicurien">
-                    <span class="text-2xl mr-3">&#x1F942;</span>
-                    <div><div class="text-sm font-black">L'Epicurien</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">La qualite avant tout - je veux les meilleures adresses</div></div>
+                    <span class="text-2xl mr-3">🍷</span>
+                    <div><div class="text-sm font-black">L'Épicurien</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">La qualité avant tout - je veux les meilleures adresses</div></div>
                 </div>
                 <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="noctambule">
-                    <span class="text-2xl mr-3">&#x1F319;</span>
-                    <div><div class="text-sm font-black">Le Noctambule</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">La nuit est mon terrain de jeu prefere</div></div>
+                    <span class="text-2xl mr-3">🌙</span>
+                    <div><div class="text-sm font-black">Le Noctambule</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">La nuit est mon terrain de jeu préféré</div></div>
                 </div>
                 <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="social">
-                    <span class="text-2xl mr-3">&#x1F465;</span>
-                    <div><div class="text-sm font-black">Le Social</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Je veux partager mes decouvertes et voir celles des autres</div></div>
+                    <span class="text-2xl mr-3">👥</span>
+                    <div><div class="text-sm font-black">Le Social</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Je veux partager mes découvertes et voir celles des autres</div></div>
                 </div>
                 <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="zen">
-                    <span class="text-2xl mr-3">&#x2615;</span>
-                    <div><div class="text-sm font-black">Le Zen</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Cafes cosy, terrasses tranquilles, flanerie douce</div></div>
+                    <span class="text-2xl mr-3">☕</span>
+                    <div><div class="text-sm font-black">Le Zen</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Cafés cosy, terrasses tranquilles, flânerie douce</div></div>
                 </div>
             </div>
-            <button id="ob-finish-btn" class="auth-btn" onclick="finishOnboarding()">Lancer ma flanerie &#x1F525;</button>
+            <button id="ob-finish-btn" class="auth-btn" onclick="finishOnboarding()">Lancer ma flânerie 🔥</button>
         </div>
 
-    </div>
+    </div><!-- /onboarding-wall -->
 
-    <!-- SCRIPTS POUR L'INTERACTIVITÉ -->
+    <!-- ============================================================ -->
+    <!-- SCRIPTS -->
+    <!-- ============================================================ -->
     <script>
-        // 2. Initialiser la connexion Supabase (en haut des scripts)
-        const supabaseUrl = 'https://tevuyezitutsljuawnve.supabase.co';
-        const supabaseKey = 'sb_publishable_vp8_66K1QaclvIBB3Su1hw_5jMLuMtO';
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+    // ================================================================
+    // INIT SUPABASE
+    // ================================================================
+    const supabaseUrl = 'https://tevuyezitutsljuawnve.supabase.co';
+    const supabaseKey = 'sb_publishable_vp8_66K1QaclvIBB3Su1hw_5jMLuMtO';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Initialisation de la Carte Interactive (Leaflet)
-        let map;
-        let markersLayer;
+    // ================================================================
+    // UTILS
+    // ================================================================
 
-        function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([48.86, 2.38], 13);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(map);
-            markersLayer = L.featureGroup().addTo(map);
+    // Protection XSS : toujours utiliser esc() avant d'injecter en innerHTML
+    function esc(str) {
+        if (!str) return '';
+        const d = document.createElement('div');
+        d.textContent = String(str);
+        return d.innerHTML;
+    }
+
+    // Debounce pour la recherche
+    function debounce(fn, delay) {
+        let t;
+        return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+    }
+
+    // Formater les jours restants
+    function daysLeft(endsAt) {
+        if (!endsAt) return 'Permanent';
+        const diff = Math.ceil((new Date(endsAt) - Date.now()) / 86400000);
+        if (diff <= 0) return 'Expiré';
+        if (diff === 1) return '1j restant';
+        return diff + 'j restants';
+    }
+
+    // Niveau depuis XP
+    function getLevel(xp) {
+        const levels = [
+            { num: 1, title: 'Touriste',          min: 0,    max: 100,  next: 100  },
+            { num: 2, title: 'Curieux',            min: 100,  max: 300,  next: 300  },
+            { num: 3, title: 'Flâneur',            min: 300,  max: 600,  next: 600  },
+            { num: 5, title: 'Local Expert',       min: 600,  max: 1200, next: 1200 },
+            { num: 8, title: 'Connaisseur',        min: 1200, max: 2500, next: 2500 },
+            { num: 14, title: 'Légende Parisienne',min: 2500, max: 9999, next: 9999 },
+        ];
+        return levels.find(l => xp >= l.min && xp < l.max) || levels[levels.length - 1];
+    }
+
+    // Étoiles HTML (read-only)
+    function starsHtml(rating) {
+        if (!rating) return '';
+        let html = '';
+        for (let i = 1; i <= 5; i++) {
+            html += `<span style="color:${i <= Math.round(rating) ? '#059669' : '#d6d3d1'}; font-size:10px;">★</span>`;
         }
-        initMap();
+        return html;
+    }
 
-        // 1. Initialisation des icônes
-        lucide.createIcons();
+    // ================================================================
+    // CARTE LEAFLET
+    // ================================================================
+    let map, markersLayer;
+    function initMap() {
+        map = L.map('map', { zoomControl: false }).setView([48.86, 2.38], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
+            subdomains: 'abcd', maxZoom: 19
+        }).addTo(map);
+        markersLayer = L.featureGroup().addTo(map);
+    }
+    initMap();
+    lucide.createIcons();
 
-        // 2. Gestion des Pages (Navigation)
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            setTimeout(() => {
-                document.getElementById('page-' + pageId).classList.add('active');
-                
-                // Rafraîchir la taille de la carte si on affiche l'onglet Explorer
-                if (pageId === 'explore' && map) {
-                    map.invalidateSize();
-                }
-            }, 50);
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('tab-active', 'text-emerald-700');
-                btn.classList.add('text-stone-300');
-                btn.querySelector('i').setAttribute('stroke-width', '2');
-            });
-            
-            const eventBtn = window.event?.currentTarget;
-            if (eventBtn && eventBtn.classList.contains('nav-btn')) {
-                eventBtn.classList.add('tab-active');
-                eventBtn.querySelector('i').setAttribute('stroke-width', '3');
-            }
-        }
-
-        // 3. Système de Notifications (Toasts)
-        let toastTimeout;
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.classList.add('show');
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        // 4. Gestion de la Modal "+" (Le Formulaire)
-        const openLogBtn = document.getElementById('open-log');
-        const closeLogBtn = document.getElementById('close-log');
-        const overlay = document.getElementById('log-overlay');
-        const modal = document.getElementById('log-modal');
-
-        openLogBtn.onclick = () => {
-            overlay.classList.remove('pointer-events-none');
-            overlay.classList.add('opacity-100');
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        };
-
-        const closeModal = () => {
-            overlay.classList.add('pointer-events-none');
-            overlay.classList.remove('opacity-100');
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        };
-
-        closeLogBtn.onclick = closeModal;
-        overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
-
-        // 5. Bouton "Like" (Coeur) interactif
-        document.querySelectorAll('.interact-btn').forEach(btn => {
-            btn.onclick = function() {
-                this.classList.toggle('text-rose-500');
-                this.classList.toggle('text-stone-300');
-                const span = this.querySelector('span');
-                if (span) {
-                    const currentVal = parseInt(span.innerText);
-                    span.innerText = currentVal + (this.classList.contains('text-rose-500') ? 1 : -1);
-                }
-                if (this.classList.contains('text-rose-500')) {
-                    showToast("Ajouté aux favoris !");
-                }
-            }
+    // ================================================================
+    // NAVIGATION PAGES
+    // ================================================================
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        setTimeout(() => {
+            document.getElementById('page-' + pageId).classList.add('active');
+            if (pageId === 'explore' && map) map.invalidateSize();
+            if (pageId === 'profile' && currentUser) loadProfilePage();
+            if (pageId === 'listes' && currentUser) fetchLists();
+        }, 50);
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('tab-active', 'text-emerald-700');
+            btn.classList.add('text-stone-300');
         });
-
-        // 6. Étoiles de notation interactives
-        const starBtns = document.querySelectorAll('.star-btn');
-        starBtns.forEach(star => {
-            star.onclick = function() {
-                const val = parseInt(this.getAttribute('data-val'));
-                starBtns.forEach(s => {
-                    const sVal = parseInt(s.getAttribute('data-val'));
-                    if (sVal <= val) {
-                        s.classList.add('text-emerald-700', 'fill-emerald-700');
-                        s.classList.remove('text-stone-200');
-                    } else {
-                        s.classList.remove('text-emerald-700', 'fill-emerald-700');
-                        s.classList.add('text-stone-200');
-                    }
-                });
-            }
-        });
-
-        // 7. Sélecteur de Budget Interactif
-        const budgetDisplay = document.getElementById('budget-display');
-        const budgets = ["$", "$$", "$$$"];
-        let currentBudgetIndex = 2; // Par défaut sur $$$
-        function cycleBudget() {
-            currentBudgetIndex = (currentBudgetIndex + 1) % budgets.length;
-            budgetDisplay.innerText = budgets[currentBudgetIndex];
+        const eventBtn = window.event?.currentTarget;
+        if (eventBtn?.classList.contains('nav-btn')) {
+            eventBtn.classList.add('tab-active');
         }
+    }
 
-        // 8. Soumission du Formulaire Connectée à Supabase
-        document.getElementById('log-form').onsubmit = async function(e) {
-            e.preventDefault();
-            
-            const spotName = this.querySelector('input[placeholder="Nom de l\'établissement..."]').value;
-            const mustTry = this.querySelector('input[placeholder="Ex: Le Mezcal Tonic..."]').value;
+    // ================================================================
+    // TOASTS
+    // ================================================================
+    let toastTimeout;
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.innerText = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 
-            if (supabaseUrl === 'https://TON_PROJET.supabase.co') {
-                showToast("Formulaire simulé (clés manquantes) ! +20 XP 🔥");
-                setTimeout(closeModal, 800);
-                this.reset();
-                return;
-            }
+    // ================================================================
+    // LOG MODAL
+    // ================================================================
+    const openLogBtn  = document.getElementById('open-log');
+    const closeLogBtn = document.getElementById('close-log');
+    const overlay     = document.getElementById('log-overlay');
+    const modal       = document.getElementById('log-modal');
 
-            const { data, error } = await supabaseClient
-                .from('logs')
-                .insert([
-                    { 
-                        spot_name: spotName, 
-                        must_try: mustTry,
-                        budget: currentBudgetIndex + 1, 
-                        xp_earned: 20
-                    }
-                ]);
+    openLogBtn.onclick = () => {
+        overlay.classList.remove('pointer-events-none');
+        overlay.classList.add('opacity-100');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+    const closeModal = () => {
+        overlay.classList.add('pointer-events-none');
+        overlay.classList.remove('opacity-100');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+    closeLogBtn.onclick = closeModal;
+    overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
 
-            if (!error) {
-                showToast("Enregistré dans le Cloud ! +20 XP 🔥");
-                setTimeout(closeModal, 800);
-                this.reset();
-                fetchSpots(); 
-            } else {
-                showToast("Erreur lors de l'enregistrement...");
-                console.error(error);
-            }
-        };
-
-        // 9. Quêtes interactives
-        function toggleQuest(btn) {
-            if (btn.innerText === "LANCER LA QUÊTE") {
-                btn.innerText = "QUÊTE EN COURS...";
-                btn.classList.remove('bg-stone-900', 'text-white');
-                btn.classList.add('bg-emerald-100', 'text-emerald-800');
-                showToast("Quête démarrée ! Bonne flânerie.");
-            } else {
-                btn.innerText = "LANCER LA QUÊTE";
-                btn.classList.add('bg-stone-900', 'text-white');
-                btn.classList.remove('bg-emerald-100', 'text-emerald-800');
-            }
-        }
-
-        // Fonction pour centrer la carte depuis le journal
-        function viewOnMap(lat, lng) {
-            showPage('explore');
-            setTimeout(() => {
-                map.setView([lat, lng], 16);
-            }, 100);
-        }
-
-        // 10. "Remplir" le Flux dynamiquement
-        async function fetchSpots() {
-            const feed = document.getElementById('activity-feed');
-
-            if (supabaseUrl === 'https://TON_PROJET.supabase.co') {
-                feed.innerHTML = '<p class="text-sm text-stone-400 text-center italic py-10">Remplace TON_PROJET et tes clés dans le code pour voir tes spots !</p>';
-                return;
-            }
-
-            const { data: spots, error } = await supabaseClient
-                .from('spots') 
-                .select('*');
-
-            feed.innerHTML = '';
-
-            if (spots && spots.length > 0) {
-                markersLayer.clearLayers();
-
-                spots.forEach(spot => {
-                    feed.innerHTML += `
-                        <div class="bg-white rounded-[2.5rem] p-5 border border-stone-100 shadow-sm">
-                            <div class="flex items-center gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center font-bold text-emerald-800">${spot.name ? spot.name[0] : '?'}</div>
-                                <div>
-                                    <h4 class="text-sm font-black text-stone-900">${spot.name || 'Nom inconnu'}</h4>
-                                    <span class="text-[9px] text-stone-400 font-bold uppercase">${spot.category || 'Spot'}</span>
-                                </div>
-                            </div>
-                            <p class="text-sm text-stone-600 italic mb-4">"${spot.address || 'Adresse introuvable'}"</p>
-                            <div class="flex justify-between items-center">
-                                <span class="text-emerald-700 font-black">${spot.price_level || '$$'}</span>
-                                <button onclick="viewOnMap(${spot.lat || 48.8566}, ${spot.lng || 2.3522})" class="text-[10px] font-black uppercase bg-stone-100 text-stone-600 px-3 py-1 rounded-full active:scale-95 transition-transform">Voir sur la carte</button>
-                            </div>
-                        </div>
-                    `;
-
-                    if (spot.lat && spot.lng) {
-                        const marker = L.marker([spot.lat, spot.lng]).bindPopup(`
-                            <div class="text-center p-1">
-                                <h4 class="text-sm font-black text-stone-900 leading-tight mb-1">${spot.name}</h4>
-                                <span class="text-[9px] text-stone-500 font-bold uppercase">${spot.category || 'Spot'} • ${spot.rating || 'N/A'}★</span>
-                            </div>
-                        `);
-                        markersLayer.addLayer(marker);
-                    }
-                });
-
-                if (markersLayer.getLayers().length > 0) {
-                    map.fitBounds(markersLayer.getBounds(), { padding: [30, 30] });
-                }
-            } else {
-                feed.innerHTML = '<p class="text-sm text-stone-400 text-center italic py-10">Aucun spot dans la base de données pour le moment.</p>';
-            }
-        }
-
-        // Appeler la fonction au chargement
-        fetchSpots();
-
-        // ============================================================
-        // SYSTÈME DE LISTES RÉELLES
-        // ============================================================
-
-        function openCreateList() {
-            const overlay = document.getElementById('create-list-overlay');
-            const modal = document.getElementById('create-list-modal');
-            overlay.classList.remove('pointer-events-none');
-            overlay.classList.add('opacity-100');
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            lucide.createIcons();
-        }
-
-        function closeCreateList() {
-            const overlay = document.getElementById('create-list-overlay');
-            const modal = document.getElementById('create-list-modal');
-            overlay.classList.add('pointer-events-none');
-            overlay.classList.remove('opacity-100');
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        document.getElementById('create-list-overlay').onclick = function(e) {
-            if (e.target === this) closeCreateList();
-        };
-
-        async function saveNewList() {
-            if (!currentUser) { showToast('Connecte-toi pour créer une liste'); return; }
-            const name = document.getElementById('new-list-name').value.trim();
-            if (!name) { showToast('Donne un nom à ta liste'); return; }
-            const iconEl = document.querySelector('#list-icon-picker .vibe-chip.selected');
-            const icon = iconEl ? iconEl.dataset.val : 'star';
-
-            const { error } = await supabaseClient
-                .from('lists')
-                .insert([{ user_id: currentUser.id, name, icon }]);
-
-            if (!error) {
-                showToast('Liste créée ! 🎉');
-                document.getElementById('new-list-name').value = '';
-                closeCreateList();
-                fetchLists();
-            } else {
-                showToast('Erreur création liste...');
-                console.error(error);
-            }
-        }
-
-        const iconMap = {
-            sun: '☀️', coffee: '☕', heart: '❤️',
-            star: '⭐', moon: '🌙', zap: '⚡'
-        };
-
-        async function fetchLists() {
-            if (!currentUser) return;
-            const container = document.getElementById('lists-container');
-            const { data: lists, error } = await supabaseClient
-                .from('lists')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-
-            if (!lists || lists.length === 0) {
-                container.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-center">'
-                    + '<div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mb-4">'
-                    + '<i data-lucide="layers" class="w-7 h-7 text-stone-300"></i></div>'
-                    + '<p class="text-sm font-black text-stone-400 uppercase tracking-widest mb-1">Aucune liste</p>'
-                    + '<p class="text-xs text-stone-300 font-medium mb-6">Crée ta première liste de spots</p>'
-                    + '<button onclick="openCreateList()" class="px-6 py-3 bg-emerald-950 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-transform">+ Créer une liste</button>'
-                    + '</div>';
-                lucide.createIcons();
-                // Update stat
-                const statListes = document.getElementById('stat-listes');
-                if (statListes) statListes.innerText = '0';
-                return;
-            }
-
-            container.innerHTML = '';
-            lists.forEach(list => {
-                container.innerHTML += '<div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center gap-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer">'
-                    + '<div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl">' + (iconMap[list.icon] || '⭐') + '</div>'
-                    + '<div class="flex-1">'
-                    + '<h4 class="text-sm font-black text-stone-900">' + list.name + '</h4>'
-                    + '<p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">0 spots</p>'
-                    + '</div>'
-                    + '<i data-lucide="chevron-right" class="w-5 h-5 text-stone-300"></i>'
-                    + '</div>';
-            });
-
-            // Update stat
-            const statListes = document.getElementById('stat-listes');
-            if (statListes) statListes.innerText = lists.length;
-        }
-
-        // ============================================================
-        // STATS PROFIL RÉELLES
-        // ============================================================
-
-        async function fetchProfileStats() {
-            if (!currentUser) return;
-
-            // Nombre de logs
-            const { count: logsCount } = await supabaseClient
-                .from('logs')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', currentUser.id);
-
-            const statSpots = document.getElementById('stat-spots');
-            if (statSpots) statSpots.innerText = logsCount || 0;
-
-            // Streak depuis le profil
-            const statStreak = document.getElementById('stat-streak');
-            if (statStreak && userProfile) statStreak.innerText = userProfile.streak_days || 0;
-
-            // Listes
-            fetchLists();
-        }
-
-        // ============================================================
-        // SYSTEME AUTH & ONBOARDING FLANR
-        // ============================================================
-
-        let currentUser = null;
-        let userProfile = null;
-        let selectedAvatarSeed = 'Felix';
-
-        // --- Gestion des ecrans auth ---
-        function showAuthScreen(name) {
-            document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
-            const el = document.getElementById('auth-' + name);
-            if (el) el.classList.add('active');
-        }
-
-        // --- Signup ---
-        async function handleSignup() {
-            const pseudo = document.getElementById('signup-pseudo').value.trim();
-            const email = document.getElementById('signup-email').value.trim();
-            const password = document.getElementById('signup-password').value;
-            const errEl = document.getElementById('signup-error');
-            const btn = document.getElementById('signup-btn');
-
-            errEl.classList.remove('show');
-
-            if (!pseudo || pseudo.length < 2) {
-                errEl.innerText = 'Choisis un pseudo (2 car. min)'; errEl.classList.add('show'); return;
-            }
-            if (!email || !email.includes('@')) {
-                errEl.innerText = 'Email invalide'; errEl.classList.add('show'); return;
-            }
-            if (!password || password.length < 8) {
-                errEl.innerText = 'Mot de passe trop court (8 min)'; errEl.classList.add('show'); return;
-            }
-
-            btn.disabled = true; btn.innerText = 'Création...';
-
-            console.log('[FLANR] Tentative signup pour:', email);
-
-            let data, error;
-            try {
-                const result = await supabaseClient.auth.signUp({
-                    email, password,
-                    options: { data: { pseudo } }
-                });
-                data = result.data;
-                error = result.error;
-                console.log('[FLANR] Résultat signUp:', { data, error });
-            } catch(e) {
-                console.error('[FLANR] Exception signUp:', e);
-                btn.disabled = false; btn.innerText = 'Créer mon compte 🔥';
-                errEl.innerText = 'Erreur réseau. Vérifie ta connexion.';
-                errEl.classList.add('show'); return;
-            }
-
-            btn.disabled = false; btn.innerText = 'Créer mon compte 🔥';
-
-            if (error) {
-                console.error('[FLANR] Erreur auth:', error);
-                if (error.message.includes('already registered') || error.message.includes('User already registered')) {
-                    errEl.innerText = 'Cet email est déjà utilisé. Connecte-toi !';
+    // ================================================================
+    // ÉTOILES DE NOTATION (log form)
+    // ================================================================
+    let currentRating = 0;
+    const starBtns = document.querySelectorAll('.star-btn');
+    starBtns.forEach(star => {
+        star.onclick = function () {
+            currentRating = parseInt(this.dataset.val);
+            starBtns.forEach(s => {
+                const v = parseInt(s.dataset.val);
+                if (v <= currentRating) {
+                    s.classList.add('text-emerald-700', 'fill-emerald-700');
+                    s.classList.remove('text-stone-200');
                 } else {
-                    errEl.innerText = error.message;
+                    s.classList.remove('text-emerald-700', 'fill-emerald-700');
+                    s.classList.add('text-stone-200');
                 }
-                errEl.classList.add('show'); return;
-            }
+            });
+        };
+    });
 
-            // Stocker le pseudo pour l'onboarding
-            window._signupPseudo = pseudo;
+    // ================================================================
+    // BUDGET CYCLER
+    // ================================================================
+    const budgetDisplay = document.getElementById('budget-display');
+    const budgets = ['$', '$$', '$$$', '$$$$'];
+    let currentBudgetIndex = 1;
+    function cycleBudget() {
+        currentBudgetIndex = (currentBudgetIndex + 1) % budgets.length;
+        budgetDisplay.innerText = budgets[currentBudgetIndex];
+    }
 
-            // Si confirmation email désactivée → session directe
-            if (data && data.session) {
-                console.log('[FLANR] Session directe OK, onboarding...');
-                return; // onAuthStateChange gère la suite
-            }
+    // ================================================================
+    // CACHE SPOTS
+    // ================================================================
+    let spotsCache = null;
+    let currentPage = 0;
+    const PAGE_SIZE = 12;
+    let totalSpotsLoaded = 0;
 
-            // Sinon → écran de confirmation email
-            console.log('[FLANR] Pas de session, affichage écran confirmation');
-            showAuthScreen('confirm');
+    // ================================================================
+    // FETCH FEED (vue feed_logs enrichie) — avec pagination
+    // ================================================================
+    async function fetchSpots(reset = true) {
+        const feed = document.getElementById('activity-feed');
+        if (reset) {
+            currentPage = 0;
+            totalSpotsLoaded = 0;
+            spotsCache = null;
+            feed.innerHTML = '<p class="text-sm text-stone-400 text-center italic py-10">Chargement…</p>';
         }
 
-        // --- Login ---
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            const errEl = document.getElementById('login-error');
-            const btn = document.getElementById('login-btn');
+        // Construction de la query personnalisée
+        let query = supabaseClient
+            .from('feed_logs')
+            .select('id, user_id, author_pseudo, author_avatar_seed, author_avatar_url, spot_id, spot_name_db, spot_name, spot_category, spot_address, spot_photo_url, spot_rating, spot_price_level, spot_lat, spot_lng, review, must_try, photo_url, likes_count, visited_at, created_at')
+            .order('created_at', { ascending: false })
+            .range(currentPage * PAGE_SIZE, currentPage * PAGE_SIZE + PAGE_SIZE - 1);
 
-            errEl.classList.remove('show');
-            btn.disabled = true; btn.innerText = 'Connexion...';
-
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-            btn.disabled = false; btn.innerText = 'Se connecter';
-
-            if (error) {
-                errEl.innerText = 'Email ou mot de passe incorrect'; errEl.classList.add('show'); return;
-            }
-
-            // onAuthStateChange va gerer la suite
+        // Personnalisation par vibes
+        if (userProfile?.vibes?.length > 0) {
+            const vibeToCategory = {
+                bar: 'Bar', vin: 'Bar', restaurant: 'Restaurant',
+                cafe: 'Cafe', brunch: 'Cafe', rooftop: 'Bar',
+                jazz: 'Bar', club: 'Club', boulangerie: 'Boulangerie',
+                streetfood: 'Restaurant', nature: 'Spot', culture: 'Culture'
+            };
+            const cats = [...new Set(userProfile.vibes.map(v => vibeToCategory[v]).filter(Boolean))];
+            if (cats.length > 0) query = query.in('spot_category', cats);
         }
 
-        // --- Logout ---
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
+        const { data: logs, error } = await query;
+        if (error) { console.error(error); return; }
+
+        if (reset) feed.innerHTML = '';
+
+        if (!logs || logs.length === 0) {
+            if (reset) {
+                // Fallback : spots directs si feed_logs vide
+                await fetchSpotsDirectFallback();
+            }
+            document.getElementById('load-more-wrap').style.display = 'none';
+            return;
+        }
+
+        // Mise à jour titre feed
+        const titleEl = document.getElementById('feed-title');
+        if (titleEl && userProfile) {
+            const titles = {
+                noctambule: 'Spots de Nuit 🌙',
+                epicurien:  'Les Meilleures Adresses 🍷',
+                zen:        'Tes Havres de Paix ☕',
+            };
+            titleEl.textContent = titles[userProfile.persona] || 'Pour toi ce soir ✨';
+        }
+
+        // Rendu — tableau puis injection unique (évite O(n²))
+        const cards = logs.map(log => renderFeedCard(log));
+        feed.insertAdjacentHTML('beforeend', cards.join(''));
+
+        totalSpotsLoaded += logs.length;
+        const loadMoreWrap = document.getElementById('load-more-wrap');
+        loadMoreWrap.style.display = logs.length === PAGE_SIZE ? 'flex' : 'none';
+
+        // Mise à jour marqueurs carte
+        markersLayer.clearLayers();
+        logs.forEach(log => {
+            if (log.spot_lat && log.spot_lng) {
+                const m = L.marker([log.spot_lat, log.spot_lng]).bindPopup(
+                    `<div class="text-center p-1">
+                        <h4 class="text-sm font-black text-stone-900 leading-tight mb-1">${esc(log.spot_name_db || log.spot_name)}</h4>
+                        <span class="text-[9px] text-stone-500 font-bold uppercase">${esc(log.spot_category || 'Spot')} • ${log.spot_rating || 'N/A'}★</span>
+                    </div>`
+                );
+                markersLayer.addLayer(m);
+            }
+        });
+        if (markersLayer.getLayers().length > 0) {
+            map.fitBounds(markersLayer.getBounds(), { padding: [30, 30] });
+        }
+    }
+
+    // Rendu d'une carte de feed (protégée XSS)
+    function renderFeedCard(log) {
+        const spotName   = esc(log.spot_name_db || log.spot_name || 'Spot inconnu');
+        const category   = esc(log.spot_category || 'Spot');
+        const address    = esc(log.spot_address || '');
+        const price      = esc(log.spot_price_level || '');
+        const review     = esc(log.review || '');
+        const mustTry    = esc(log.must_try || '');
+        const author     = esc(log.author_pseudo || 'Flaneur');
+        const avatarSeed = log.author_avatar_seed || 'Felix';
+        const photoUrl   = log.spot_photo_url || log.photo_url || '';
+        const rating     = log.spot_rating || 0;
+        const likes      = log.likes_count || 0;
+        const lat        = log.spot_lat || 48.8566;
+        const lng        = log.spot_lng || 2.3522;
+
+        const photoBlock = photoUrl
+            ? `<img src="${esc(photoUrl)}" alt="${spotName}" class="spot-photo" loading="lazy" onerror="this.parentElement.removeChild(this)">`
+            : `<div class="spot-photo-placeholder"><span style="font-size:28px">${category === 'Bar' ? '🍸' : category === 'Cafe' ? '☕' : category === 'Restaurant' ? '🍽' : '📍'}</span></div>`;
+
+        const reviewBlock = review
+            ? `<p class="text-xs text-stone-600 font-medium leading-relaxed mb-3 italic">"${review}"</p>`
+            : '';
+
+        const mustTryBlock = mustTry
+            ? `<div class="flex items-center gap-2 mb-3">
+                <span class="text-[9px] font-black text-orange-600 bg-orange-50 px-2 py-1 rounded-full uppercase">Must-try</span>
+                <span class="text-xs text-stone-600 font-medium">${mustTry}</span>
+               </div>`
+            : '';
+
+        return `<div class="bg-white rounded-[2.5rem] overflow-hidden border border-stone-100 shadow-sm">
+            ${photoBlock}
+            <div class="p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${esc(avatarSeed)}"
+                        class="w-8 h-8 rounded-full bg-stone-100 flex-shrink-0" loading="lazy">
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-sm font-black text-stone-900 truncate">${spotName}</h4>
+                        <span class="text-[9px] text-stone-400 font-bold uppercase">${category}${address ? ' · ' + address : ''}</span>
+                    </div>
+                    ${price ? `<span class="text-xs font-black text-emerald-700 flex-shrink-0">${price}</span>` : ''}
+                </div>
+                ${rating ? `<div class="flex items-center gap-1 mb-3">${starsHtml(rating)}<span class="text-[9px] font-bold text-stone-400 ml-1">${rating}</span></div>` : ''}
+                ${reviewBlock}
+                ${mustTryBlock}
+                <div class="flex justify-between items-center pt-2 border-t border-stone-50">
+                    <span class="text-[9px] text-stone-400 font-bold">Par ${author}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-[9px] text-stone-400">${likes > 0 ? '❤️ ' + likes : ''}</span>
+                        <button onclick="viewOnMap(${lat}, ${lng})"
+                            class="text-[9px] font-black uppercase bg-stone-100 text-stone-600 px-3 py-1.5 rounded-full active:scale-95 transition-transform">Voir carte</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    // Fallback : spots directs (si la vue feed_logs est vide)
+    async function fetchSpotsDirectFallback() {
+        const feed = document.getElementById('activity-feed');
+        const { data: spots } = await supabaseClient
+            .from('spots')
+            .select('id, name, category, address, lat, lng, rating, rating_count, price_level, photo_url, tags')
+            .order('rating', { ascending: false })
+            .limit(PAGE_SIZE);
+
+        if (!spots || spots.length === 0) {
+            feed.innerHTML = '<p class="text-sm text-stone-400 text-center italic py-10">Aucun spot dans la base pour le moment.</p>';
+            return;
+        }
+
+        markersLayer.clearLayers();
+        const cards = spots.map(spot => {
+            const photoBlock = spot.photo_url
+                ? `<img src="${esc(spot.photo_url)}" alt="${esc(spot.name)}" class="spot-photo" loading="lazy">`
+                : `<div class="spot-photo-placeholder"><span style="font-size:28px">${spot.category === 'Bar' ? '🍸' : spot.category === 'Cafe' ? '☕' : '📍'}</span></div>`;
+
+            const tagsBlock = spot.tags?.length
+                ? `<div class="flex flex-wrap gap-1 mb-3">${spot.tags.slice(0, 3).map(t => `<span class="tag-pill">${esc(t)}</span>`).join('')}</div>`
+                : '';
+
+            if (spot.lat && spot.lng) {
+                markersLayer.addLayer(L.marker([spot.lat, spot.lng]).bindPopup(
+                    `<div class="text-center p-1"><h4 class="text-sm font-black text-stone-900">${esc(spot.name)}</h4><span class="text-[9px] text-stone-500">${esc(spot.category || '')} · ${spot.rating || 'N/A'}★</span></div>`
+                ));
+            }
+
+            return `<div class="bg-white rounded-[2.5rem] overflow-hidden border border-stone-100 shadow-sm">
+                ${photoBlock}
+                <div class="p-5">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center font-black text-emerald-800 flex-shrink-0">${esc(spot.name?.[0] || '?')}</div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-black text-stone-900 truncate">${esc(spot.name)}</h4>
+                            <span class="text-[9px] text-stone-400 font-bold uppercase">${esc(spot.category || 'Spot')}</span>
+                        </div>
+                        ${spot.price_level ? `<span class="text-xs font-black text-emerald-700">${esc(spot.price_level)}</span>` : ''}
+                    </div>
+                    ${spot.rating ? `<div class="flex items-center gap-1 mb-3">${starsHtml(spot.rating)}<span class="text-[9px] font-bold text-stone-400 ml-1">${spot.rating} (${spot.rating_count})</span></div>` : ''}
+                    ${tagsBlock}
+                    ${spot.address ? `<p class="text-xs text-stone-500 italic mb-3">${esc(spot.address)}</p>` : ''}
+                    <div class="flex justify-end">
+                        <button onclick="viewOnMap(${spot.lat || 48.8566}, ${spot.lng || 2.3522})"
+                            class="text-[9px] font-black uppercase bg-stone-100 text-stone-600 px-3 py-1.5 rounded-full active:scale-95 transition-transform">Voir carte</button>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        feed.innerHTML = cards.join('');
+        if (markersLayer.getLayers().length > 0) map.fitBounds(markersLayer.getBounds(), { padding: [30, 30] });
+    }
+
+    // Pagination "load more"
+    function loadMoreSpots() {
+        currentPage++;
+        fetchSpots(false);
+    }
+
+    // ================================================================
+    // RECHERCHE FULL-TEXT (RPC search_spots)
+    // ================================================================
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+    const searchResultsList = document.getElementById('search-results-list');
+
+    const doSearch = debounce(async (q) => {
+        if (!q || q.length < 2) { searchResults.classList.remove('show'); return; }
+
+        const { data: results } = await supabaseClient
+            .rpc('search_spots', { query_text: q, max_results: 6 });
+
+        if (!results || results.length === 0) {
+            searchResultsList.innerHTML = '<p class="text-xs text-stone-400 text-center py-4">Aucun résultat</p>';
+            searchResults.classList.add('show');
+            return;
+        }
+
+        searchResultsList.innerHTML = results.map(s => `
+            <div onclick="selectSearchResult(${s.lat || 48.8566}, ${s.lng || 2.3522}, '${esc(s.name)}')"
+                class="flex items-center gap-3 px-4 py-3 active:bg-stone-50 cursor-pointer border-b border-stone-50 last:border-0">
+                <div class="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-800 font-black text-xs flex-shrink-0">
+                    ${esc(s.name?.[0] || '?')}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-bold text-stone-900 truncate">${esc(s.name)}</p>
+                    <p class="text-[9px] text-stone-400 font-bold uppercase">${esc(s.category || 'Spot')}${s.address ? ' · ' + esc(s.address) : ''}</p>
+                </div>
+                ${s.rating ? `<span class="text-[9px] font-black text-emerald-700">★ ${s.rating}</span>` : ''}
+            </div>
+        `).join('');
+        searchResults.classList.add('show');
+    }, 400);
+
+    searchInput.addEventListener('input', (e) => doSearch(e.target.value.trim()));
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.classList.remove('show');
+        }
+    });
+
+    function selectSearchResult(lat, lng, name) {
+        searchResults.classList.remove('show');
+        searchInput.value = '';
+        showPage('explore');
+        setTimeout(() => { map.setView([lat, lng], 17); }, 150);
+        showToast(name + ' sur la carte !');
+    }
+
+    function triggerDiscovery() {
+        showToast('Mode Découverte activé !');
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const { latitude: lat, longitude: lng } = pos.coords;
+                showPage('explore');
+                setTimeout(async () => {
+                    map.setView([lat, lng], 15);
+                    const { data: nearby } = await supabaseClient
+                        .rpc('nearby_spots', { user_lat: lat, user_lng: lng, radius_m: 500 });
+                    if (nearby?.length) showToast(`${nearby.length} spots dans les 500m ! 📍`);
+                }, 150);
+            });
+        }
+    }
+
+    // ================================================================
+    // FILTRE CARTE PAR CATÉGORIE
+    // ================================================================
+    async function filterMapByCategory(category) {
+        const label = category || 'tous les spots';
+        showToast('Chargement ' + label + '…');
+        showPage('explore');
+
+        let query = supabaseClient
+            .from('spots')
+            .select('id, name, category, lat, lng, rating, price_level')
+            .not('lat', 'is', null)
+            .limit(50);
+
+        if (category) query = query.eq('category', category);
+
+        const { data: spots } = await query;
+        if (!spots) return;
+
+        markersLayer.clearLayers();
+        spots.forEach(s => {
+            if (s.lat && s.lng) {
+                markersLayer.addLayer(L.marker([s.lat, s.lng]).bindPopup(
+                    `<div class="text-center p-1"><h4 class="text-sm font-black">${esc(s.name)}</h4><span class="text-[9px] text-stone-500">${esc(s.category || '')} · ${s.rating || 'N/A'}★</span></div>`
+                ));
+            }
+        });
+        if (markersLayer.getLayers().length > 0) {
+            setTimeout(() => { map.fitBounds(markersLayer.getBounds(), { padding: [30, 30] }); }, 100);
+        }
+    }
+
+    function viewOnMap(lat, lng) {
+        showPage('explore');
+        setTimeout(() => map.setView([lat, lng], 16), 100);
+    }
+
+    function toggleQuest(btn) {
+        if (btn.innerText === 'LANCER LA QUÊTE') {
+            btn.innerText = 'QUÊTE EN COURS…';
+            btn.classList.replace('bg-stone-900', 'bg-emerald-100');
+            btn.classList.replace('text-white', 'text-emerald-800');
+            showToast('Quête démarrée ! Bonne flânerie.');
+        } else {
+            btn.innerText = 'LANCER LA QUÊTE';
+            btn.classList.replace('bg-emerald-100', 'bg-stone-900');
+            btn.classList.replace('text-emerald-800', 'text-white');
+        }
+    }
+
+    // ================================================================
+    // SOUMISSION LOG (→ logs + spot_ratings)
+    // ================================================================
+    // Spot-match : recherche le spot en DB quand l'utilisateur tape
+    let matchedSpotId = null;
+    const logSpotInput = document.getElementById('log-spot-name');
+    const matchHint    = document.getElementById('spot-match-hint');
+    const matchName    = document.getElementById('spot-match-name');
+
+    logSpotInput.addEventListener('input', debounce(async (e) => {
+        const q = e.target.value.trim();
+        if (q.length < 3) { matchHint.classList.add('hidden'); matchedSpotId = null; return; }
+
+        const { data } = await supabaseClient
+            .from('spots')
+            .select('id, name')
+            .ilike('name', `%${q}%`)
+            .limit(1)
+            .single();
+
+        if (data) {
+            matchedSpotId = data.id;
+            matchName.textContent = data.name;
+            matchHint.classList.remove('hidden');
+        } else {
+            matchedSpotId = null;
+            matchHint.classList.add('hidden');
+        }
+    }, 500));
+
+    document.getElementById('log-form').onsubmit = async function (e) {
+        e.preventDefault();
+        if (!currentUser) { showToast('Connecte-toi pour journaliser !'); return; }
+
+        const spotName = document.getElementById('log-spot-name').value.trim();
+        const review   = document.getElementById('log-review').value.trim();
+        const mustTry  = document.getElementById('log-must-try').value.trim();
+        const budget   = currentBudgetIndex + 1;
+
+        if (!spotName) { showToast('Donne un nom au spot !'); return; }
+
+        const submitBtn = this.querySelector('[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Enregistrement…';
+
+        // 1. Insérer le log
+        const logPayload = {
+            user_id:   currentUser.id,
+            spot_name: spotName,
+            review:    review || null,
+            must_try:  mustTry || null,
+            budget,
+            xp_earned: 20,
+        };
+        if (matchedSpotId) logPayload.spot_id = matchedSpotId;
+
+        const { data: newLog, error: logError } = await supabaseClient
+            .from('logs')
+            .insert([logPayload])
+            .select()
+            .single();
+
+        if (logError) {
+            showToast('Erreur lors de l\'enregistrement…');
+            console.error(logError);
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Journaliser & Gagner de l\'XP';
+            return;
+        }
+
+        // 2. Upsert le rating si l'utilisateur a noté ET qu'on a un spot_id
+        if (currentRating > 0 && matchedSpotId) {
+            await supabaseClient
+                .from('spot_ratings')
+                .upsert({
+                    user_id: currentUser.id,
+                    spot_id: matchedSpotId,
+                    rating:  currentRating,
+                }, { onConflict: 'user_id,spot_id' });
+        }
+
+        // Reset
+        showToast('Journalisé ! +20 XP 🔥');
+        setTimeout(closeModal, 800);
+        this.reset();
+        currentRating = 0;
+        matchedSpotId = null;
+        matchHint.classList.add('hidden');
+        starBtns.forEach(s => { s.classList.remove('text-emerald-700', 'fill-emerald-700'); s.classList.add('text-stone-200'); });
+        budgetDisplay.innerText = '$$';
+        currentBudgetIndex = 1;
+
+        // Invalider le cache et recharger le feed
+        spotsCache = null;
+        fetchSpots(true);
+
+        // Mettre à jour le profil (XP, streak)
+        if (userProfile) {
+            userProfile.xp = (userProfile.xp || 0) + 20;
+            applyProfileToApp();
+        }
+    };
+
+    // ================================================================
+    // DÉFI HEBDO (chargé depuis challenges + challenge_progress)
+    // ================================================================
+    async function fetchChallenge() {
+        if (!currentUser) return;
+
+        // Charger le défi actif + la progression de l'utilisateur en parallèle
+        const [{ data: challenges }, { data: progresses }] = await Promise.all([
+            supabaseClient
+                .from('challenges')
+                .select('id, title, description, goal, xp_reward, ends_at, badge_emoji, badge_name')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false })
+                .limit(1),
+            supabaseClient
+                .from('challenge_progress')
+                .select('challenge_id, progress, completed')
+                .eq('user_id', currentUser.id)
+        ]);
+
+        if (!challenges || challenges.length === 0) return;
+        const challenge = challenges[0];
+        const progress  = progresses?.find(p => p.challenge_id === challenge.id);
+        const current   = progress?.progress || 0;
+        const pct       = Math.min(100, Math.round((current / challenge.goal) * 100));
+
+        document.getElementById('challenge-title').textContent = `${challenge.badge_emoji || '🏆'} ${challenge.title}`;
+        document.getElementById('challenge-desc').textContent  = challenge.description || '';
+        document.getElementById('challenge-timer').textContent = daysLeft(challenge.ends_at);
+        document.getElementById('challenge-bar').style.width   = pct + '%';
+        document.getElementById('challenge-score').textContent = `${current} / ${challenge.goal}`;
+
+        // Si complété, créer la progression si elle n'existe pas
+        if (!progress) {
+            await supabaseClient
+                .from('challenge_progress')
+                .upsert({ user_id: currentUser.id, challenge_id: challenge.id, progress: 0 },
+                         { onConflict: 'user_id,challenge_id' });
+        }
+    }
+
+    // ================================================================
+    // LISTES (vue lists_with_count → compteur réel)
+    // ================================================================
+    const iconMap = { sun: '☀️', coffee: '☕', heart: '❤️', star: '⭐', moon: '🌙', zap: '⚡' };
+
+    function openCreateList() {
+        const overlay = document.getElementById('create-list-overlay');
+        const modal   = document.getElementById('create-list-modal');
+        overlay.classList.remove('pointer-events-none');
+        overlay.classList.add('opacity-100');
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        lucide.createIcons();
+    }
+    function closeCreateList() {
+        const overlay = document.getElementById('create-list-overlay');
+        const modal   = document.getElementById('create-list-modal');
+        overlay.classList.add('pointer-events-none');
+        overlay.classList.remove('opacity-100');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    document.getElementById('create-list-overlay').onclick = function (e) {
+        if (e.target === this) closeCreateList();
+    };
+
+    async function saveNewList() {
+        if (!currentUser) { showToast('Connecte-toi pour créer une liste'); return; }
+        const name = document.getElementById('new-list-name').value.trim();
+        if (!name) { showToast('Donne un nom à ta liste'); return; }
+        const iconEl = document.querySelector('#list-icon-picker .vibe-chip.selected');
+        const icon   = iconEl ? iconEl.dataset.val : 'star';
+
+        const { error } = await supabaseClient
+            .from('lists')
+            .insert([{ user_id: currentUser.id, name, icon }]);
+
+        if (!error) {
+            showToast('Liste créée ! 🎉');
+            document.getElementById('new-list-name').value = '';
+            closeCreateList();
+            fetchLists();
+        } else {
+            showToast('Erreur création liste…');
+            console.error(error);
+        }
+    }
+
+    async function fetchLists() {
+        if (!currentUser) return;
+        const container = document.getElementById('lists-container');
+
+        // Utiliser la vue lists_with_count pour le vrai compteur de spots
+        const { data: lists } = await supabaseClient
+            .from('lists_with_count')
+            .select('id, name, icon, spots_count, real_spots_count, is_public, created_at')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false });
+
+        const statListes = document.getElementById('stat-listes');
+        if (!lists || lists.length === 0) {
+            container.innerHTML = `<div class="flex flex-col items-center justify-center py-16 text-center">
+                <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mb-4">
+                    <i data-lucide="layers" class="w-7 h-7 text-stone-300"></i>
+                </div>
+                <p class="text-sm font-black text-stone-400 uppercase tracking-widest mb-1">Aucune liste</p>
+                <p class="text-xs text-stone-300 font-medium mb-6">Crée ta première liste de spots</p>
+                <button onclick="openCreateList()" class="px-6 py-3 bg-emerald-950 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-transform">+ Créer une liste</button>
+            </div>`;
+            lucide.createIcons();
+            if (statListes) statListes.innerText = '0';
+            return;
+        }
+
+        container.innerHTML = lists.map(list => {
+            const count = list.real_spots_count ?? list.spots_count ?? 0;
+            return `<div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center gap-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer">
+                <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl">${iconMap[list.icon] || '⭐'}</div>
+                <div class="flex-1">
+                    <h4 class="text-sm font-black text-stone-900">${esc(list.name)}</h4>
+                    <p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">${count} spot${count !== 1 ? 's' : ''}</p>
+                </div>
+                <i data-lucide="chevron-right" class="w-5 h-5 text-stone-300"></i>
+            </div>`;
+        }).join('');
+
+        if (statListes) statListes.innerText = lists.length;
+        lucide.createIcons();
+    }
+
+    // ================================================================
+    // PAGE PROFIL (profile_stats RPC — 1 seul appel)
+    // ================================================================
+    async function loadProfilePage() {
+        if (!currentUser) return;
+
+        const { data: stats } = await supabaseClient
+            .rpc('profile_stats', { target_user_id: currentUser.id });
+
+        if (stats) {
+            const xp      = stats.xp || 0;
+            const level   = getLevel(xp);
+            const pctXP   = Math.min(100, Math.round(((xp - level.min) / (level.next - level.min)) * 100));
+
+            document.getElementById('stat-spots').innerText     = stats.logs_count || 0;
+            document.getElementById('stat-streak').innerText    = stats.streak_days || 0;
+            document.getElementById('stat-followers').innerText = stats.followers_count || 0;
+            document.getElementById('stat-listes').innerText    = stats.lists_count || 0;
+            document.getElementById('xp-val').innerText         = 'XP : ' + xp;
+            document.getElementById('xp-next').innerText        = 'Niv. ' + (level.num + 1) + ' : ' + level.next;
+            document.getElementById('xp-bar').style.width       = pctXP + '%';
+            document.getElementById('profile-level').innerText  = level.title + ' • Niveau ' + level.num;
+
+            if (stats.top_category) {
+                document.getElementById('top-category').innerText = stats.top_category;
+            }
+            if (stats.avg_rating) {
+                document.getElementById('avg-rating').innerText = '★ ' + stats.avg_rating + ' / 5';
+            }
+        }
+
+        // Bio
+        if (userProfile?.bio) {
+            const bioEl = document.getElementById('profile-bio');
+            bioEl.textContent = userProfile.bio;
+            bioEl.style.display = 'block';
+        }
+
+        // Fetch listes en parallèle
+        fetchLists();
+    }
+
+    // ================================================================
+    // NOTIFICATIONS
+    // ================================================================
+    async function fetchNotifCount() {
+        if (!currentUser) return;
+        const { count } = await supabaseClient
+            .from('notifications')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', currentUser.id)
+            .eq('is_read', false);
+
+        const badge = document.getElementById('notif-badge');
+        if (count && count > 0) {
+            badge.innerText = count > 9 ? '9+' : count;
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    async function openNotifDrawer() {
+        const drawer = document.getElementById('notif-drawer');
+        drawer.classList.add('open');
+        document.body.style.overflow = 'hidden';
+
+        const { data: notifs } = await supabaseClient
+            .from('notifications')
+            .select('id, type, message, is_read, created_at, actor_id')
+            .eq('user_id', currentUser.id)
+            .order('created_at', { ascending: false })
+            .limit(15);
+
+        const list = document.getElementById('notif-list');
+        if (!notifs || notifs.length === 0) {
+            list.innerHTML = '<p class="text-xs text-stone-400 text-center py-6 italic">Aucune notification pour l\'instant</p>';
+        } else {
+            const typeIcon = { new_follower: '👤', log_like: '❤️', challenge_done: '🏆', streak_alert: '🔥', badge_earned: '⭐' };
+            list.innerHTML = notifs.map(n => `
+                <div class="flex items-start gap-3 p-3 rounded-2xl ${n.is_read ? 'bg-transparent' : 'bg-emerald-50'}">
+                    <span class="text-lg flex-shrink-0">${typeIcon[n.type] || '📌'}</span>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-stone-800 leading-snug">${esc(n.message || n.type)}</p>
+                        <p class="text-[9px] text-stone-400 mt-0.5">${new Date(n.created_at).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                    ${!n.is_read ? '<span class="w-2 h-2 bg-emerald-500 rounded-full flex-shrink-0 mt-1"></span>' : ''}
+                </div>
+            `).join('');
+
+            // Marquer comme lues
+            await supabaseClient
+                .from('notifications')
+                .update({ is_read: true })
+                .eq('user_id', currentUser.id)
+                .eq('is_read', false);
+
+            document.getElementById('notif-badge').style.display = 'none';
+        }
+    }
+
+    function closeNotifDrawer() {
+        document.getElementById('notif-drawer').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // ================================================================
+    // REAL-TIME (nouveaux logs en direct)
+    // ================================================================
+    function subscribeToRealtime() {
+        supabaseClient
+            .channel('public:logs')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'logs' }, (payload) => {
+                // Ne pas notifier pour ses propres logs
+                if (payload.new.user_id !== currentUser?.id) {
+                    showToast('✨ Nouveau spot journalisé !');
+                    // Invalider le cache pour que le prochain refresh charge le nouveau log
+                    spotsCache = null;
+                }
+            })
+            .subscribe();
+    }
+
+    // ================================================================
+    // APPLY PROFILE TO UI
+    // ================================================================
+    function applyProfileToApp() {
+        if (!userProfile) return;
+        const seed = userProfile.avatar_seed || 'Felix';
+        const avatarUrl = userProfile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+
+        document.getElementById('header-avatar').src = avatarUrl;
+        document.getElementById('profile-avatar').src = avatarUrl;
+        document.getElementById('profile-name').textContent = userProfile.pseudo || 'Flâneur';
+
+        const s = userProfile.streak_days || 0;
+        document.getElementById('header-streak').textContent = `${s} Jour${s > 1 ? 's' : ''} de Série 🔥`;
+
+        const xp    = userProfile.xp || 0;
+        const level = getLevel(xp);
+        document.getElementById('xp-val').innerText   = 'XP : ' + xp;
+        document.getElementById('xp-bar').style.width = Math.min(100, Math.round(((xp - level.min) / (level.next - level.min)) * 100)) + '%';
+        document.getElementById('xp-next').innerText  = 'Niv. ' + (level.num + 1) + ' : ' + level.next;
+        document.getElementById('profile-level').textContent = level.title + ' • Niveau ' + level.num;
+    }
+
+    // ================================================================
+    // ENTER APP
+    // ================================================================
+    function enterApp() {
+        document.getElementById('auth-wall').classList.add('hidden');
+        document.getElementById('onboarding-wall').style.display = 'none';
+        applyProfileToApp();
+
+        // Charger tout en parallèle
+        Promise.all([
+            fetchSpots(),
+            fetchChallenge(),
+            fetchNotifCount(),
+        ]);
+
+        subscribeToRealtime();
+    }
+
+    // ================================================================
+    // AUTH
+    // ================================================================
+    let currentUser = null;
+    let userProfile = null;
+    let selectedAvatarSeed = 'Felix';
+
+    function showAuthScreen(name) {
+        document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
+        const el = document.getElementById('auth-' + name);
+        if (el) el.classList.add('active');
+    }
+
+    async function handleSignup() {
+        const pseudo    = document.getElementById('signup-pseudo').value.trim();
+        const email     = document.getElementById('signup-email').value.trim();
+        const password  = document.getElementById('signup-password').value;
+        const errEl     = document.getElementById('signup-error');
+        const btn       = document.getElementById('signup-btn');
+        errEl.classList.remove('show');
+
+        if (!pseudo || pseudo.length < 2) { errEl.innerText = 'Pseudo trop court (2 min)'; errEl.classList.add('show'); return; }
+        if (!email || !email.includes('@')) { errEl.innerText = 'Email invalide'; errEl.classList.add('show'); return; }
+        if (!password || password.length < 8) { errEl.innerText = 'Mot de passe trop court (8 min)'; errEl.classList.add('show'); return; }
+
+        btn.disabled = true; btn.innerText = 'Création…';
+        const { error } = await supabaseClient.auth.signUp({ email, password, options: { data: { pseudo } } });
+        btn.disabled = false; btn.innerText = 'Créer mon compte 🔥';
+
+        if (error) { errEl.innerText = error.message; errEl.classList.add('show'); return; }
+        window._signupPseudo = pseudo;
+        showAuthScreen('confirm');
+    }
+
+    async function handleLogin() {
+        const email    = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const errEl    = document.getElementById('login-error');
+        const btn      = document.getElementById('login-btn');
+        errEl.classList.remove('show');
+        btn.disabled = true; btn.innerText = 'Connexion…';
+
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        btn.disabled = false; btn.innerText = 'Se connecter';
+
+        if (error) { errEl.innerText = 'Email ou mot de passe incorrect'; errEl.classList.add('show'); }
+    }
+
+    async function handleLogout() {
+        await supabaseClient.auth.signOut();
+        currentUser = null; userProfile = null;
+        document.getElementById('auth-wall').classList.remove('hidden');
+        showAuthScreen('landing');
+    }
+
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (session?.user) {
+            currentUser = session.user;
+            await loadOrInitProfile();
+        } else {
             currentUser = null; userProfile = null;
             document.getElementById('auth-wall').classList.remove('hidden');
+            document.getElementById('onboarding-wall').style.display = 'none';
             showAuthScreen('landing');
         }
+    });
 
-        // --- Ecouter les changements d'auth ---
-        supabaseClient.auth.onAuthStateChange(async (event, session) => {
-            if (session && session.user) {
-                currentUser = session.user;
-                await loadOrInitProfile();
-            } else {
-                currentUser = null;
-                userProfile = null;
-                document.getElementById('auth-wall').classList.remove('hidden');
-                document.getElementById('onboarding-wall').style.display = 'none';
-                showAuthScreen('landing');
-            }
-        });
+    async function loadOrInitProfile() {
+        const { data: profile } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('id', currentUser.id)
+            .single();
 
-        // --- Charger ou initialiser le profil ---
-        async function loadOrInitProfile() {
-            const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', currentUser.id)
-                .single();
-
-            if (profile && profile.onboarding_done) {
-                // Profil complet -> entrer dans l'app
-                userProfile = profile;
-                enterApp();
-            } else if (profile) {
-                // Profil existe mais onboarding pas fini
-                userProfile = profile;
-                document.getElementById('auth-wall').classList.add('hidden');
-                startOnboarding();
-            } else {
-                // Nouveau profil
-                const pseudo = window._signupPseudo || currentUser.user_metadata?.pseudo || 'Flaneur';
-                const { data: newProfile } = await supabaseClient
-                    .from('profiles')
-                    .insert([{ id: currentUser.id, pseudo, email: currentUser.email, onboarding_done: false }])
-                    .select().single();
-                userProfile = newProfile;
-                document.getElementById('auth-wall').classList.add('hidden');
-                startOnboarding();
-            }
-        }
-
-        // --- Entrer dans l'app ---
-        function enterApp() {
+        if (profile?.onboarding_done) {
+            userProfile = profile;
+            enterApp();
+        } else if (profile) {
+            userProfile = profile;
             document.getElementById('auth-wall').classList.add('hidden');
-            document.getElementById('onboarding-wall').style.display = 'none';
+            startOnboarding();
+        } else {
+            const pseudo = window._signupPseudo || currentUser.user_metadata?.pseudo || 'Flâneur';
+            const { data: newProfile } = await supabaseClient
+                .from('profiles')
+                .insert([{ id: currentUser.id, pseudo, email: currentUser.email, onboarding_done: false }])
+                .select().single();
+            userProfile = newProfile;
+            document.getElementById('auth-wall').classList.add('hidden');
+            startOnboarding();
+        }
+    }
 
-            // Mettre a jour le header avec les vraies infos
-            applyProfileToApp();
+    // ================================================================
+    // ONBOARDING
+    // ================================================================
+    let obData = { pseudo: '', city: 'Paris', avatar_seed: 'Felix', vibes: [], budget: 2, timing: [], company: [], quartiers: [], persona: '' };
 
-            // Charger les spots personnalises
-            fetchSpots();
+    function startOnboarding() {
+        if (userProfile?.pseudo) {
+            const el = document.getElementById('ob-pseudo');
+            if (el) el.value = userProfile.pseudo;
+        }
+        document.getElementById('onboarding-wall').style.display = 'flex';
+        obGoTo(1);
+    }
+
+    function obGoTo(step) {
+        document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
+        const el = document.getElementById('ob-step-' + step);
+        if (el) el.classList.add('active');
+        const prog = document.getElementById('ob-progress');
+        if (prog) prog.style.width = (step * 20) + '%';
+        lucide.createIcons();
+    }
+
+    function obNext(nextStep) { collectObStep(nextStep - 1); obGoTo(nextStep); }
+    function obBack(prevStep) { obGoTo(prevStep); }
+
+    function collectObStep(step) {
+        if (step === 1) {
+            obData.pseudo      = document.getElementById('ob-pseudo').value.trim() || userProfile?.pseudo || 'Flâneur';
+            obData.city        = document.getElementById('ob-city').value;
+            obData.avatar_seed = selectedAvatarSeed;
+        }
+        if (step === 2) obData.vibes   = getSelectedChips('vibes-picker');
+        if (step === 3) {
+            const b = document.querySelector('#budget-ob-picker .vibe-chip.selected');
+            obData.budget  = b ? parseInt(b.dataset.val) : 2;
+            obData.timing  = getSelectedChips('timing-picker');
+            obData.company = getSelectedChips('company-picker');
+        }
+        if (step === 4) obData.quartiers = getSelectedChips('quartiers-picker');
+    }
+
+    function getSelectedChips(containerId) {
+        return Array.from(document.querySelectorAll('#' + containerId + ' .vibe-chip.selected')).map(c => c.dataset.val);
+    }
+
+    async function finishOnboarding() {
+        collectObStep(4);
+        const personaSel  = document.querySelector('#persona-picker .vibe-chip.selected');
+        obData.persona    = personaSel ? personaSel.dataset.val : 'explorateur';
+        obData.pseudo     = obData.pseudo || document.getElementById('ob-pseudo').value.trim() || 'Flâneur';
+
+        const btn = document.getElementById('ob-finish-btn');
+        if (btn) { btn.disabled = true; btn.innerText = 'Sauvegarde…'; }
+
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({
+                pseudo:          obData.pseudo,
+                city:            obData.city,
+                avatar_seed:     obData.avatar_seed,
+                vibes:           obData.vibes,
+                budget_pref:     obData.budget,
+                timing_pref:     obData.timing,
+                company_pref:    obData.company,
+                quartiers_pref:  obData.quartiers,
+                persona:         obData.persona,
+                onboarding_done: true,
+                xp:              50,
+            })
+            .eq('id', currentUser.id);
+
+        if (error) {
+            if (btn) { btn.disabled = false; btn.innerText = 'Lancer ma flânerie 🔥'; }
+            showToast('Erreur sauvegarde…');
+            return;
         }
 
-        // --- Appliquer le profil a l'UI de l'app ---
-        function applyProfileToApp() {
-            if (!userProfile) return;
+        const { data: updatedProfile } = await supabaseClient
+            .from('profiles').select('*').eq('id', currentUser.id).single();
+        userProfile = updatedProfile;
 
-            // Avatar dans le header
-            const avatarSrc = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (userProfile.avatar_seed || 'Felix');
-            document.querySelectorAll('img[alt="Profil"], img[alt="Felix"]').forEach(img => {
-                img.src = avatarSrc;
-            });
+        showToast('Bienvenue ' + obData.pseudo + ' ! +50 XP offerts 🔥');
+        enterApp();
+    }
 
-            // Streak dans le header
-            const streakEl = document.querySelector('.text-orange-700');
-            if (streakEl && userProfile.streak_days !== undefined) {
-                const s = userProfile.streak_days || 0;
-                streakEl.innerHTML = s + ' Jour' + (s > 1 ? 's' : '') + ' de Serie &#x1F525;';
-            }
+    // ================================================================
+    // UI HELPERS ONBOARDING
+    // ================================================================
+    function selectAvatar(el) {
+        document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedAvatarSeed = el.dataset.seed;
+    }
+    function toggleChip(el) { el.classList.toggle('selected'); }
+    function selectSingle(el, containerId) {
+        document.querySelectorAll('#' + containerId + ' .vibe-chip').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+    }
 
-            // Profil page
-            const nameEl = document.querySelector('#page-profile h2.font-serif');
-            if (nameEl) nameEl.innerText = userProfile.pseudo || 'Flaneur';
-
-            const levelEl = document.querySelector('#page-profile p.text-stone-400');
-            if (levelEl) {
-                const xp = userProfile.xp || 0;
-                const level = getLevel(xp);
-                levelEl.innerText = level.title + ' - Niveau ' + level.num;
-            }
-
-            // XP bar
-            const xpEl = document.querySelector('#page-profile .font-black.text-stone-900, span[id="xp-val"]');
-            if (xpEl) xpEl.innerText = 'XP : ' + (userProfile.xp || 0);
-
-            // Bouton deconnexion dans le profil
-            const profileStats = document.querySelector('#page-profile .space-y-4');
-            if (profileStats && !document.getElementById('logout-btn-profile')) {
-                const logoutDiv = document.createElement('div');
-                logoutDiv.innerHTML = '<button id="logout-btn-profile" onclick="handleLogout()" class="w-full mt-4 py-4 rounded-3xl border-2 border-rose-100 text-rose-500 text-xs font-black uppercase tracking-widest active:scale-95 transition-transform">Se deconnecter</button>';
-                profileStats.appendChild(logoutDiv);
-            }
-        }
-
-        function getLevel(xp) {
-            if (xp < 100) return { num: 1, title: 'Touriste' };
-            if (xp < 300) return { num: 2, title: 'Curieux' };
-            if (xp < 600) return { num: 3, title: 'Flaneur' };
-            if (xp < 1200) return { num: 5, title: 'Local Expert' };
-            if (xp < 2500) return { num: 8, title: 'Connaisseur' };
-            return { num: 14, title: 'Legende Parisienne' };
-        }
-
-        // ============================================================
-        // ONBOARDING
-        // ============================================================
-
-        let obData = {
-            pseudo: '', city: 'Paris', avatar_seed: 'Felix',
-            vibes: [], budget: 2, timing: [], company: [], quartiers: [], persona: ''
-        };
-
-        function startOnboarding() {
-            // Pre-remplir le pseudo
-            if (userProfile && userProfile.pseudo) {
-                const obPseudo = document.getElementById('ob-pseudo');
-                if (obPseudo) obPseudo.value = userProfile.pseudo;
-            }
-            document.getElementById('onboarding-wall').style.display = 'flex';
-            obGoTo(1);
-        }
-
-        function obGoTo(step) {
-            document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
-            const el = document.getElementById('ob-step-' + step);
-            if (el) el.classList.add('active');
-            const progress = document.getElementById('ob-progress');
-            if (progress) progress.style.width = (step * 20) + '%';
+    // ================================================================
+    // INIT : vérifier la session au démarrage
+    // ================================================================
+    (async () => {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session?.user) {
+            currentUser = session.user;
+            await loadOrInitProfile();
+        } else {
+            document.getElementById('auth-wall').classList.remove('hidden');
             lucide.createIcons();
         }
-
-        function obNext(nextStep) {
-            // Sauvegarder les donnees de l'etape courante
-            collectObStep(nextStep - 1);
-            obGoTo(nextStep);
-        }
-
-        function obBack(prevStep) {
-            obGoTo(prevStep);
-        }
-
-        function collectObStep(step) {
-            if (step === 1) {
-                obData.pseudo = document.getElementById('ob-pseudo').value.trim() || userProfile?.pseudo || 'Flaneur';
-                obData.city = document.getElementById('ob-city').value;
-                obData.avatar_seed = selectedAvatarSeed;
-            }
-            if (step === 2) {
-                obData.vibes = getSelectedChips('vibes-picker');
-            }
-            if (step === 3) {
-                const budgetSel = document.querySelector('#budget-ob-picker .vibe-chip.selected');
-                obData.budget = budgetSel ? parseInt(budgetSel.dataset.val) : 2;
-                obData.timing = getSelectedChips('timing-picker');
-                obData.company = getSelectedChips('company-picker');
-            }
-            if (step === 4) {
-                obData.quartiers = getSelectedChips('quartiers-picker');
-            }
-        }
-
-        function getSelectedChips(containerId) {
-            const chips = document.querySelectorAll('#' + containerId + ' .vibe-chip.selected');
-            return Array.from(chips).map(c => c.dataset.val);
-        }
-
-        async function finishOnboarding() {
-            // Collecter etape 5
-            collectObStep(4);
-            const personaSel = document.querySelector('#persona-picker .vibe-chip.selected');
-            obData.persona = personaSel ? personaSel.dataset.val : 'explorateur';
-            obData.pseudo = obData.pseudo || document.getElementById('ob-pseudo').value.trim() || 'Flaneur';
-
-            const btn = document.getElementById('ob-finish-btn');
-            if (btn) { btn.disabled = true; btn.innerText = 'Sauvegarde...'; }
-
-            const { error } = await supabaseClient
-                .from('profiles')
-                .update({
-                    pseudo: obData.pseudo,
-                    city: obData.city,
-                    avatar_seed: obData.avatar_seed,
-                    vibes: obData.vibes,
-                    budget_pref: obData.budget,
-                    timing_pref: obData.timing,
-                    company_pref: obData.company,
-                    quartiers_pref: obData.quartiers,
-                    persona: obData.persona,
-                    onboarding_done: true,
-                    xp: 50  // XP de bienvenue
-                })
-                .eq('id', currentUser.id);
-
-            if (error) {
-                if (btn) { btn.disabled = false; btn.innerText = 'Lancer ma flanerie'; }
-                showToast('Erreur sauvegarde...');
-                console.error(error);
-                return;
-            }
-
-            // Recharger le profil
-            const { data: updatedProfile } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', currentUser.id)
-                .single();
-            userProfile = updatedProfile;
-
-            showToast('Bienvenue ' + obData.pseudo + ' ! +50 XP offerts &#x1F525;');
-            enterApp();
-        }
-
-        // --- UI Helpers onboarding ---
-        function selectAvatar(el) {
-            document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedAvatarSeed = el.dataset.seed;
-        }
-
-        function toggleChip(el) {
-            el.classList.toggle('selected');
-        }
-
-        function selectSingle(el, containerId) {
-            document.querySelectorAll('#' + containerId + ' .vibe-chip').forEach(c => c.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        // ============================================================
-        // PERSONNALISATION DU FEED (recommandations)
-        // ============================================================
-
-        // Override fetchSpots pour personnaliser selon le profil
-        const _originalFetchSpots = fetchSpots;
-
-        async function fetchSpotsPersonalized() {
-            const feed = document.getElementById('activity-feed');
-            if (!feed) return;
-
-            let query = supabaseClient.from('spots').select('*');
-
-            // Filtrer par vibes si profil existe
-            if (userProfile && userProfile.vibes && userProfile.vibes.length > 0) {
-                const vibeToCategory = {
-                    'bar': 'Bar', 'vin': 'Bar', 'restaurant': 'Restaurant',
-                    'cafe': 'Cafe', 'brunch': 'Cafe', 'rooftop': 'Bar',
-                    'jazz': 'Bar', 'club': 'Club', 'boulangerie': 'Boulangerie',
-                    'streetfood': 'Restaurant', 'nature': 'Spot'
-                };
-                const cats = [...new Set(userProfile.vibes.map(v => vibeToCategory[v]).filter(Boolean))];
-                if (cats.length > 0) {
-                    query = query.in('category', cats);
-                }
-            }
-
-            // Filtrer par budget si profil existe
-            if (userProfile && userProfile.budget_pref) {
-                const budgetMap = { 1: ['$'], 2: ['$', '$$'], 3: ['$', '$$', '$$$', '$$$$'] };
-                const allowed = budgetMap[userProfile.budget_pref] || ['$', '$$', '$$$'];
-                query = query.in('price_level', allowed);
-            }
-
-            // Trier par note
-            query = query.order('rating', { ascending: false }).limit(50);
-
-            const { data: spots, error } = await query;
-            feed.innerHTML = '';
-
-            if (spots && spots.length > 0) {
-                markersLayer.clearLayers();
-
-                // Titre personnalise
-                const feedTitle = document.querySelector('#page-home h2.font-serif');
-                if (feedTitle && userProfile) {
-                    feedTitle.innerHTML = userProfile.persona === 'noctambule'
-                        ? 'Spots de Nuit &#x1F319;'
-                        : userProfile.persona === 'epicurien'
-                        ? 'Les Meilleures Adresses &#x1F942;'
-                        : userProfile.persona === 'zen'
-                        ? 'Tes Havres de Paix &#x2615;'
-                        : 'Pour toi ce soir &#x2728;';
-                }
-
-                spots.forEach(spot => {
-                    feed.innerHTML += '<div class="bg-white rounded-[2.5rem] p-5 border border-stone-100 shadow-sm">'
-                        + '<div class="flex items-center gap-3 mb-4">'
-                        + '<div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center font-bold text-emerald-800">' + (spot.name ? spot.name[0] : '?') + '</div>'
-                        + '<div>'
-                        + '<h4 class="text-sm font-black text-stone-900">' + (spot.name || 'Nom inconnu') + '</h4>'
-                        + '<span class="text-[9px] text-stone-400 font-bold uppercase">' + (spot.category || 'Spot') + '</span>'
-                        + '</div></div>'
-                        + '<p class="text-sm text-stone-600 italic mb-4">"' + (spot.address || 'Adresse introuvable') + '"</p>'
-                        + '<div class="flex justify-between items-center">'
-                        + '<div class="flex items-center gap-2">'
-                        + '<span class="text-emerald-700 font-black">' + (spot.price_level || '$$') + '</span>'
-                        + (spot.rating ? '<span class="text-[10px] text-stone-400 font-bold">&#x2605; ' + spot.rating + '</span>' : '')
-                        + '</div>'
-                        + '<button onclick="viewOnMap(' + (spot.lat || 48.8566) + ', ' + (spot.lng || 2.3522) + ')" class="text-[10px] font-black uppercase bg-stone-100 text-stone-600 px-3 py-1 rounded-full active:scale-95 transition-transform">Voir sur la carte</button>'
-                        + '</div></div>';
-
-                    if (spot.lat && spot.lng) {
-                        const marker = L.marker([spot.lat, spot.lng]).bindPopup(
-                            '<div class="text-center p-1"><h4 class="text-sm font-black text-stone-900 leading-tight mb-1">' + spot.name + '</h4>'
-                            + '<span class="text-[9px] text-stone-500 font-bold uppercase">' + (spot.category || 'Spot') + ' &#x2022; ' + (spot.rating || 'N/A') + '&#x2605;</span></div>'
-                        );
-                        markersLayer.addLayer(marker);
-                    }
-                });
-
-                if (markersLayer.getLayers().length > 0) {
-                    map.fitBounds(markersLayer.getBounds(), { padding: [30, 30] });
-                }
-            } else {
-                // Fallback : tous les spots
-                _originalFetchSpots();
-            }
-        }
-
-        // Remplacer fetchSpots par la version personnalisee
-        window.fetchSpots = fetchSpotsPersonalized;
-
-        // ============================================================
-        // INIT : verifier la session au demarrage
-        // ============================================================
-        (async () => {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (session && session.user) {
-                currentUser = session.user;
-                await loadOrInitProfile();
-            } else {
-                // Pas connecte -> montrer l'auth wall
-                document.getElementById('auth-wall').classList.remove('hidden');
-                lucide.createIcons();
-            }
-        })();
-
-
+    })();
     </script>
 </body>
 </html>

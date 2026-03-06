@@ -1911,26 +1911,80 @@
     });
 
     async function loadOrInitProfile() {
-        const { data: profile } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('id', currentUser.id)
-            .single();
+        try {
+            const { data: profile, error: fetchError } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .maybeSingle(); // maybeSingle() ne crash pas si 0 résultats (contrairement à single())
 
-        if (profile?.onboarding_done) {
-            userProfile = profile;
-            enterApp();
-        } else if (profile) {
-            userProfile = profile;
+            if (fetchError) throw fetchError;
+
+            if (profile?.onboarding_done) {
+                userProfile = profile;
+                enterApp();
+                return;
+            }
+
+            if (profile) {
+                // Profil existe mais onboarding pas fini
+                userProfile = profile;
+                document.getElementById('auth-wall').classList.add('hidden');
+                startOnboarding();
+                return;
+            }
+
+            // Profil absent → le trigger create_profile_on_signup aurait dû le créer
+            // On attend 1s et on réessaie (le trigger est async côté Supabase)
+            await new Promise(r => setTimeout(r, 1000));
+
+            const { data: retryProfile } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .maybeSingle();
+
+            if (retryProfile) {
+                userProfile = retryProfile;
+                document.getElementById('auth-wall').classList.add('hidden');
+                if (retryProfile.onboarding_done) {
+                    enterApp();
+                } else {
+                    startOnboarding();
+                }
+                return;
+            }
+
+            // Toujours absent → on le crée manuellement (fallback)
+            const pseudo = window._signupPseudo || currentUser.user_metadata?.pseudo || 'Flâneur';
+            const { data: newProfile, error: insertError } = await supabaseClient
+                .from('profiles')
+                .upsert([{
+                    id:              currentUser.id,
+                    pseudo:          pseudo,
+                    email:           currentUser.email,
+                    onboarding_done: false,
+                }], { onConflict: 'id' })
+                .select()
+                .maybeSingle();
+
+            if (insertError) throw insertError;
+
+            userProfile = newProfile || { id: currentUser.id, pseudo, onboarding_done: false };
             document.getElementById('auth-wall').classList.add('hidden');
             startOnboarding();
-        } else {
-            const pseudo = window._signupPseudo || currentUser.user_metadata?.pseudo || 'Flâneur';
-            const { data: newProfile } = await supabaseClient
-                .from('profiles')
-                .insert([{ id: currentUser.id, pseudo, email: currentUser.email, onboarding_done: false }])
-                .select().single();
-            userProfile = newProfile;
+
+        } catch (err) {
+            console.error('loadOrInitProfile error:', err);
+            // Même en cas d'erreur DB, on laisse entrer l'utilisateur en onboarding
+            // avec un profil minimal en mémoire — rien ne bloque
+            userProfile = userProfile || {
+                id:              currentUser.id,
+                pseudo:          window._signupPseudo || 'Flâneur',
+                onboarding_done: false,
+                xp:              0,
+                streak_days:     0,
+            };
             document.getElementById('auth-wall').classList.add('hidden');
             startOnboarding();
         }

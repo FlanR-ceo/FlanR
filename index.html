@@ -81,6 +81,116 @@
         /* Style popup de la carte */
         .leaflet-popup-content-wrapper { border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .leaflet-popup-content { font-family: 'Plus Jakarta Sans', sans-serif; margin: 12px; }
+
+        /* ===== AUTH & ONBOARDING ===== */
+        #auth-wall {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #FDFCF8;
+            display: flex; flex-direction: column;
+            max-width: 448px; margin: 0 auto;
+            overflow: hidden;
+        }
+        #auth-wall.hidden { display: none; }
+
+        .auth-screen { display: none; flex-direction: column; height: 100%; }
+        .auth-screen.active { display: flex; }
+
+        /* Onboarding steps */
+        #onboarding-wall {
+            position: fixed; inset: 0; z-index: 9998;
+            background: #FDFCF8;
+            display: none; flex-direction: column;
+            max-width: 448px; margin: 0 auto;
+            overflow: hidden;
+        }
+        #onboarding-wall.active { display: flex; }
+
+        .onboarding-step { display: none; flex-direction: column; height: 100%; padding: 0; }
+        .onboarding-step.active { display: flex; }
+
+        /* Chips sélectionnables */
+        .vibe-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 16px; border-radius: 100px;
+            border: 2px solid #e7e5e4; background: white;
+            font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+            cursor: pointer; transition: all 0.2s; color: #78716c;
+            user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .vibe-chip.selected {
+            border-color: #064e3b; background: #064e3b; color: white;
+        }
+        .vibe-chip.selected .chip-emoji { filter: none; }
+
+        /* Input style auth */
+        .auth-input {
+            width: 100%; padding: 16px 20px;
+            background: #f5f5f4; border: 2px solid transparent;
+            border-radius: 18px; font-size: 15px; font-weight: 600;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            outline: none; transition: all 0.2s; color: #1c1917;
+        }
+        .auth-input:focus { background: white; border-color: #064e3b; }
+        .auth-input::placeholder { color: #a8a29e; font-weight: 500; }
+
+        /* Bouton primaire auth */
+        .auth-btn {
+            width: 100%; padding: 18px;
+            background: #052e16; color: white;
+            border: none; border-radius: 24px;
+            font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.12em;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 10px 30px rgba(5, 46, 22, 0.3);
+        }
+        .auth-btn:active { transform: scale(0.97); }
+        .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .auth-btn-secondary {
+            width: 100%; padding: 16px;
+            background: transparent; color: #57534e;
+            border: 2px solid #e7e5e4; border-radius: 24px;
+            font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .auth-btn-secondary:active { background: #f5f5f4; }
+
+        /* Progress bar onboarding */
+        .ob-progress-bar {
+            height: 3px; border-radius: 100px;
+            background: #064e3b; transition: width 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in { animation: slideInUp 0.4s cubic-bezier(0.32, 0.72, 0, 1) both; }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .fade-in-scale { animation: fadeInScale 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; }
+
+        /* Avatar picker */
+        .avatar-option {
+            width: 64px; height: 64px; border-radius: 50%;
+            border: 3px solid transparent; cursor: pointer;
+            transition: all 0.2s; overflow: hidden;
+        }
+        .avatar-option.selected { border-color: #064e3b; box-shadow: 0 0 0 3px rgba(6,78,59,0.2); }
+        .avatar-option img { width: 100%; height: 100%; }
+
+        /* Error message */
+        .auth-error {
+            background: #fef2f2; color: #dc2626;
+            padding: 12px 16px; border-radius: 14px;
+            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+            display: none;
+        }
+        .auth-error.show { display: block; }
     </style>
 </head>
 <body class="text-stone-900 leading-relaxed overflow-x-hidden selection:bg-emerald-100">
@@ -443,6 +553,263 @@
 
     </div>
 
+    <!-- ===== AUTH WALL ===== -->
+    <div id="auth-wall">
+
+        <!-- ECRAN 1 : LANDING -->
+        <div id="auth-landing" class="auth-screen active" style="justify-content:space-between; padding: 0;">
+            <div class="relative flex-1 bg-emerald-950 flex flex-col items-center justify-center overflow-hidden" style="min-height: 55vh;">
+                <div class="absolute inset-0" style="background: radial-gradient(ellipse at 30% 50%, rgba(16,185,129,0.15) 0%, transparent 60%);"></div>
+                <div class="absolute top-16 left-8 w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl animate-float" style="animation-delay:0s">&#127863;</div>
+                <div class="absolute top-24 right-10 w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center text-lg animate-float" style="animation-delay:0.8s">&#9749;</div>
+                <div class="absolute bottom-20 left-12 w-11 h-11 bg-white/5 rounded-2xl flex items-center justify-center text-lg animate-float" style="animation-delay:1.4s">&#127928;</div>
+                <div class="absolute bottom-16 right-8 w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-xl animate-float" style="animation-delay:0.4s">&#127769;</div>
+                <div class="relative z-10 text-center px-8">
+                    <div class="flex items-center justify-center gap-3 mb-4">
+                        <span class="relative flex items-center justify-center">
+                            <span class="w-2 h-2 rounded-full bg-orange-400 z-10"></span>
+                            <span class="absolute w-4 h-4 rounded-full bg-orange-400/30 ripple"></span>
+                        </span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400 ml-2">Paris &#x2022; Maintenant</span>
+                    </div>
+                    <h1 class="text-6xl font-serif font-black text-white tracking-tighter leading-none mb-4">FLANR</h1>
+                    <p class="text-emerald-300/80 text-sm font-medium leading-relaxed">Explore. Log. Deviens une legende de ta ville.</p>
+                </div>
+            </div>
+            <div class="bg-[#FDFCF8] px-8 pt-8 pb-12 space-y-3">
+                <button class="auth-btn" onclick="showAuthScreen('signup')">Commencer ma flanerie &#x2192;</button>
+                <button class="auth-btn-secondary" onclick="showAuthScreen('login')">J'ai deja un compte</button>
+                <p class="text-center text-[9px] font-bold text-stone-300 uppercase tracking-widest pt-2">Gratuit &#x2022; Sans engagement &#x2022; 100% Paris</p>
+            </div>
+        </div>
+
+        <!-- ECRAN 2 : SIGNUP -->
+        <div id="auth-signup" class="auth-screen" style="padding: 48px 32px 40px; overflow-y: auto;">
+            <button onclick="showAuthScreen('landing')" class="flex items-center gap-2 text-stone-400 mb-8 self-start active:scale-95 transition-transform">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="text-xs font-black uppercase tracking-widest">Retour</span>
+            </button>
+            <div class="mb-8">
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-none mb-2">Bienvenue,<br>flaneur&#xB7;euse.</h2>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Cree ton compte en 30 secondes</p>
+            </div>
+            <div id="signup-error" class="auth-error mb-4"></div>
+            <div class="space-y-4 flex-1">
+                <input id="signup-pseudo" class="auth-input" type="text" placeholder="Ton pseudo (ex: NoctambuleParis)" maxlength="30">
+                <input id="signup-email" class="auth-input" type="email" placeholder="Ton email">
+                <input id="signup-password" class="auth-input" type="password" placeholder="Mot de passe (8 car. min)">
+                <button id="signup-btn" class="auth-btn mt-2" onclick="handleSignup()">Creer mon compte &#x1F525;</button>
+                <p class="text-center text-[10px] text-stone-400 font-medium">Deja inscrit&#xB7;e ? <button onclick="showAuthScreen('login')" class="text-emerald-700 font-black underline">Connexion</button></p>
+            </div>
+        </div>
+
+        <!-- ECRAN 3 : LOGIN -->
+        <div id="auth-login" class="auth-screen" style="padding: 48px 32px 40px; overflow-y: auto;">
+            <button onclick="showAuthScreen('landing')" class="flex items-center gap-2 text-stone-400 mb-8 self-start active:scale-95 transition-transform">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="text-xs font-black uppercase tracking-widest">Retour</span>
+            </button>
+            <div class="mb-8">
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-none mb-2">Content de<br>te revoir.</h2>
+                <p class="text-xs font-bold text-stone-400 uppercase tracking-widest">Reprends ta flanerie</p>
+            </div>
+            <div id="login-error" class="auth-error mb-4"></div>
+            <div class="space-y-4 flex-1">
+                <input id="login-email" class="auth-input" type="email" placeholder="Ton email">
+                <input id="login-password" class="auth-input" type="password" placeholder="Mot de passe">
+                <button id="login-btn" class="auth-btn mt-2" onclick="handleLogin()">Se connecter &#x2192;</button>
+                <p class="text-center text-[10px] text-stone-400 font-medium">Pas encore de compte ? <button onclick="showAuthScreen('signup')" class="text-emerald-700 font-black underline">S'inscrire</button></p>
+            </div>
+        </div>
+
+        <!-- ECRAN 4 : CONFIRM EMAIL -->
+        <div id="auth-confirm" class="auth-screen" style="padding: 48px 32px 40px; justify-content: center; align-items: center; text-align: center;">
+            <div class="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center text-4xl mb-6">&#x1F4EC;</div>
+            <h2 class="text-2xl font-serif font-black text-emerald-950 mb-3">Verifie tes mails !</h2>
+            <p class="text-sm text-stone-500 font-medium leading-relaxed mb-8">On t'a envoye un lien de confirmation. Clique dessus puis reviens ici.</p>
+            <button class="auth-btn" onclick="showAuthScreen('login')">J'ai confirme, me connecter &#x2192;</button>
+        </div>
+
+    </div>
+
+    <!-- ===== ONBOARDING WALL ===== -->
+    <div id="onboarding-wall">
+
+        <div class="w-full h-1 bg-stone-100 flex-shrink-0">
+            <div id="ob-progress" class="ob-progress-bar" style="width: 20%"></div>
+        </div>
+
+        <!-- STEP 1 : Pseudo + Avatar -->
+        <div id="ob-step-1" class="onboarding-step active" style="padding: 40px 32px 80px; overflow-y: auto;">
+            <div class="mb-8">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 1 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Ton identite<br>de flaneur&#xB7;euse</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Comment veux-tu apparaitre ?</p>
+            </div>
+            <div class="mb-8">
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Choisis ton avatar</label>
+                <div class="flex gap-4 flex-wrap" id="avatar-picker">
+                    <div class="avatar-option selected" data-seed="Felix" onclick="selectAvatar(this)"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar"></div>
+                    <div class="avatar-option" data-seed="Luna" onclick="selectAvatar(this)"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Luna" alt="avatar"></div>
+                    <div class="avatar-option" data-seed="Noctua" onclick="selectAvatar(this)"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Noctua" alt="avatar"></div>
+                    <div class="avatar-option" data-seed="Cleo" onclick="selectAvatar(this)"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Cleo" alt="avatar"></div>
+                    <div class="avatar-option" data-seed="Remy" onclick="selectAvatar(this)"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Remy" alt="avatar"></div>
+                    <div class="avatar-option" data-seed="Zara" onclick="selectAvatar(this)"><img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Zara" alt="avatar"></div>
+                </div>
+            </div>
+            <div class="mb-8">
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 block">Ton pseudo</label>
+                <input id="ob-pseudo" class="auth-input" type="text" placeholder="Ex: NoctambuleParis" maxlength="30">
+            </div>
+            <div class="mb-8">
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 block">Ta ville principale</label>
+                <select id="ob-city" class="auth-input" style="cursor:pointer;">
+                    <option value="Paris">Paris</option>
+                    <option value="Lyon">Lyon</option>
+                    <option value="Marseille">Marseille</option>
+                    <option value="Bordeaux">Bordeaux</option>
+                    <option value="Lille">Lille</option>
+                    <option value="Autre">Autre</option>
+                </select>
+            </div>
+            <button class="auth-btn" onclick="obNext(2)">Suivant &#x2192;</button>
+        </div>
+
+        <!-- STEP 2 : Vibes -->
+        <div id="ob-step-2" class="onboarding-step" style="padding: 40px 32px 80px; overflow-y: auto;">
+            <button onclick="obBack(1)" class="flex items-center gap-2 text-stone-400 mb-6 active:scale-95 transition-transform">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="text-xs font-black uppercase tracking-widest">Retour</span>
+            </button>
+            <div class="mb-8">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 2 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Tes vibes,<br>tes regles.</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Qu'est-ce qui t'attire ? (plusieurs choix)</p>
+            </div>
+            <div class="flex flex-wrap gap-3" id="vibes-picker">
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="bar">&#x1F378; Bars &amp; Cocktails</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="vin">&#x1F377; Bar a vins</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="restaurant">&#x1F37D; Restos</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="cafe">&#x2615; Cafes</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="brunch">&#x1F951; Brunch</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="rooftop">&#x1F306; Rooftops</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="jazz">&#x1F3B7; Jazz &amp; Live</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="club">&#x1F3A7; Clubs &amp; Nuits</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="culture">&#x1F3A8; Expos &amp; Culture</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="boulangerie">&#x1F950; Boulangeries</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="streetfood">&#x1F32E; Street Food</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="nature">&#x1F33F; Parcs &amp; Plein air</div>
+            </div>
+            <button class="auth-btn mt-8" onclick="obNext(3)">Suivant &#x2192;</button>
+        </div>
+
+        <!-- STEP 3 : Budget & Horaires -->
+        <div id="ob-step-3" class="onboarding-step" style="padding: 40px 32px 80px; overflow-y: auto;">
+            <button onclick="obBack(2)" class="flex items-center gap-2 text-stone-400 mb-6 active:scale-95 transition-transform">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="text-xs font-black uppercase tracking-widest">Retour</span>
+            </button>
+            <div class="mb-8">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 3 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Ton style<br>de flanerie.</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Pour des reco ultra-precises</p>
+            </div>
+            <div class="mb-8">
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Ton budget moyen par sortie</label>
+                <div class="flex gap-3 flex-wrap" id="budget-ob-picker">
+                    <div class="vibe-chip" onclick="selectSingle(this, 'budget-ob-picker')" data-val="1">$ Petit budget</div>
+                    <div class="vibe-chip selected" onclick="selectSingle(this, 'budget-ob-picker')" data-val="2">$$ Moyen</div>
+                    <div class="vibe-chip" onclick="selectSingle(this, 'budget-ob-picker')" data-val="3">$$$ Genereux</div>
+                </div>
+            </div>
+            <div class="mb-8">
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Tu sors plutot...</label>
+                <div class="flex flex-wrap gap-3" id="timing-picker">
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="weekend">&#x1F5D3; Week-ends</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="semaine">&#x1F4C5; En semaine</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="aprem">&#x2600; L'apres-midi</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="soir">&#x1F306; Le soir</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="nuit">&#x1F319; La nuit</div>
+                </div>
+            </div>
+            <div class="mb-8">
+                <label class="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-4 block">Tu flanes generalement...</label>
+                <div class="flex flex-wrap gap-3" id="company-picker">
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="solo">&#x1F6B6; Solo</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="amis">&#x1F465; Entre amis</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="date">&#x1F491; En date</div>
+                    <div class="vibe-chip" onclick="toggleChip(this)" data-val="collegues">&#x1F4BC; Collegues</div>
+                </div>
+            </div>
+            <button class="auth-btn" onclick="obNext(4)">Suivant &#x2192;</button>
+        </div>
+
+        <!-- STEP 4 : Quartiers -->
+        <div id="ob-step-4" class="onboarding-step" style="padding: 40px 32px 80px; overflow-y: auto;">
+            <button onclick="obBack(3)" class="flex items-center gap-2 text-stone-400 mb-6 active:scale-95 transition-transform">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="text-xs font-black uppercase tracking-widest">Retour</span>
+            </button>
+            <div class="mb-8">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 4 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Tes quartiers<br>de coeur.</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Selectionne tes zones (plusieurs ok)</p>
+            </div>
+            <div class="flex flex-wrap gap-3" id="quartiers-picker">
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="marais">Le Marais</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="oberkampf">Oberkampf</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="montmartre">Montmartre</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="bastille">Bastille</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="saint-germain">Saint-Germain</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="canal">Canal Saint-Martin</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="belleville">Belleville</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="pigalle">Pigalle / SoPi</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="republique">Republique</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="latin">Quartier Latin</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="batignolles">Batignolles</div>
+                <div class="vibe-chip" onclick="toggleChip(this)" data-val="nation">Nation</div>
+            </div>
+            <button class="auth-btn mt-8" onclick="obNext(5)">Suivant &#x2192;</button>
+        </div>
+
+        <!-- STEP 5 : Persona -->
+        <div id="ob-step-5" class="onboarding-step" style="padding: 40px 32px 80px; overflow-y: auto;">
+            <button onclick="obBack(4)" class="flex items-center gap-2 text-stone-400 mb-6 active:scale-95 transition-transform">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                <span class="text-xs font-black uppercase tracking-widest">Retour</span>
+            </button>
+            <div class="mb-8">
+                <span class="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">Etape 5 / 5</span>
+                <h2 class="text-3xl font-serif font-black text-emerald-950 leading-tight mt-2">Derniere<br>question.</h2>
+                <p class="text-xs text-stone-400 font-bold uppercase tracking-wider mt-2">Qu'est-ce qui decrit le mieux ta vibe ?</p>
+            </div>
+            <div class="space-y-3 mb-8" id="persona-picker">
+                <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="explorateur">
+                    <span class="text-2xl mr-3">&#x1F5FA;</span>
+                    <div><div class="text-sm font-black">L'Explorateur</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Je cherche toujours le spot que personne ne connait encore</div></div>
+                </div>
+                <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="epicurien">
+                    <span class="text-2xl mr-3">&#x1F942;</span>
+                    <div><div class="text-sm font-black">L'Epicurien</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">La qualite avant tout - je veux les meilleures adresses</div></div>
+                </div>
+                <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="noctambule">
+                    <span class="text-2xl mr-3">&#x1F319;</span>
+                    <div><div class="text-sm font-black">Le Noctambule</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">La nuit est mon terrain de jeu prefere</div></div>
+                </div>
+                <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="social">
+                    <span class="text-2xl mr-3">&#x1F465;</span>
+                    <div><div class="text-sm font-black">Le Social</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Je veux partager mes decouvertes et voir celles des autres</div></div>
+                </div>
+                <div class="vibe-chip w-full justify-start text-left p-4" style="border-radius: 20px;" onclick="selectSingle(this, 'persona-picker')" data-val="zen">
+                    <span class="text-2xl mr-3">&#x2615;</span>
+                    <div><div class="text-sm font-black">Le Zen</div><div class="text-[10px] opacity-60 font-medium normal-case tracking-normal">Cafes cosy, terrasses tranquilles, flanerie douce</div></div>
+                </div>
+            </div>
+            <button id="ob-finish-btn" class="auth-btn" onclick="finishOnboarding()">Lancer ma flanerie &#x1F525;</button>
+        </div>
+
+    </div>
+
     <!-- SCRIPTS POUR L'INTERACTIVITÉ -->
     <script>
         // 2. Initialiser la connexion Supabase (en haut des scripts)
@@ -686,6 +1053,428 @@
 
         // Appeler la fonction au chargement
         fetchSpots();
+
+        // ============================================================
+        // SYSTEME AUTH & ONBOARDING FLANR
+        // ============================================================
+
+        let currentUser = null;
+        let userProfile = null;
+        let selectedAvatarSeed = 'Felix';
+
+        // --- Gestion des ecrans auth ---
+        function showAuthScreen(name) {
+            document.querySelectorAll('.auth-screen').forEach(s => s.classList.remove('active'));
+            const el = document.getElementById('auth-' + name);
+            if (el) el.classList.add('active');
+        }
+
+        // --- Signup ---
+        async function handleSignup() {
+            const pseudo = document.getElementById('signup-pseudo').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const errEl = document.getElementById('signup-error');
+            const btn = document.getElementById('signup-btn');
+
+            errEl.classList.remove('show');
+
+            if (!pseudo || pseudo.length < 2) {
+                errEl.innerText = 'Choisis un pseudo (2 car. min)'; errEl.classList.add('show'); return;
+            }
+            if (!email || !email.includes('@')) {
+                errEl.innerText = 'Email invalide'; errEl.classList.add('show'); return;
+            }
+            if (!password || password.length < 8) {
+                errEl.innerText = 'Mot de passe trop court (8 min)'; errEl.classList.add('show'); return;
+            }
+
+            btn.disabled = true; btn.innerText = 'Creation...';
+
+            const { data, error } = await supabaseClient.auth.signUp({
+                email, password,
+                options: { data: { pseudo } }
+            });
+
+            btn.disabled = false; btn.innerText = 'Creer mon compte';
+
+            if (error) {
+                errEl.innerText = error.message; errEl.classList.add('show'); return;
+            }
+
+            // Stocker le pseudo pour l'onboarding
+            window._signupPseudo = pseudo;
+            showAuthScreen('confirm');
+        }
+
+        // --- Login ---
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errEl = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+
+            errEl.classList.remove('show');
+            btn.disabled = true; btn.innerText = 'Connexion...';
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            btn.disabled = false; btn.innerText = 'Se connecter';
+
+            if (error) {
+                errEl.innerText = 'Email ou mot de passe incorrect'; errEl.classList.add('show'); return;
+            }
+
+            // onAuthStateChange va gerer la suite
+        }
+
+        // --- Logout ---
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            currentUser = null; userProfile = null;
+            document.getElementById('auth-wall').classList.remove('hidden');
+            showAuthScreen('landing');
+        }
+
+        // --- Ecouter les changements d'auth ---
+        supabaseClient.auth.onAuthStateChange(async (event, session) => {
+            if (session && session.user) {
+                currentUser = session.user;
+                await loadOrInitProfile();
+            } else {
+                currentUser = null;
+                userProfile = null;
+                document.getElementById('auth-wall').classList.remove('hidden');
+                document.getElementById('onboarding-wall').style.display = 'none';
+                showAuthScreen('landing');
+            }
+        });
+
+        // --- Charger ou initialiser le profil ---
+        async function loadOrInitProfile() {
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (profile && profile.onboarding_done) {
+                // Profil complet -> entrer dans l'app
+                userProfile = profile;
+                enterApp();
+            } else if (profile) {
+                // Profil existe mais onboarding pas fini
+                userProfile = profile;
+                document.getElementById('auth-wall').classList.add('hidden');
+                startOnboarding();
+            } else {
+                // Nouveau profil
+                const pseudo = window._signupPseudo || currentUser.user_metadata?.pseudo || 'Flaneur';
+                const { data: newProfile } = await supabaseClient
+                    .from('profiles')
+                    .insert([{ id: currentUser.id, pseudo, email: currentUser.email, onboarding_done: false }])
+                    .select().single();
+                userProfile = newProfile;
+                document.getElementById('auth-wall').classList.add('hidden');
+                startOnboarding();
+            }
+        }
+
+        // --- Entrer dans l'app ---
+        function enterApp() {
+            document.getElementById('auth-wall').classList.add('hidden');
+            document.getElementById('onboarding-wall').style.display = 'none';
+
+            // Mettre a jour le header avec les vraies infos
+            applyProfileToApp();
+
+            // Charger les spots personnalises
+            fetchSpots();
+        }
+
+        // --- Appliquer le profil a l'UI de l'app ---
+        function applyProfileToApp() {
+            if (!userProfile) return;
+
+            // Avatar dans le header
+            const avatarSrc = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (userProfile.avatar_seed || 'Felix');
+            document.querySelectorAll('img[alt="Profil"], img[alt="Felix"]').forEach(img => {
+                img.src = avatarSrc;
+            });
+
+            // Streak dans le header
+            const streakEl = document.querySelector('.text-orange-700');
+            if (streakEl && userProfile.streak_days !== undefined) {
+                const s = userProfile.streak_days || 0;
+                streakEl.innerHTML = s + ' Jour' + (s > 1 ? 's' : '') + ' de Serie &#x1F525;';
+            }
+
+            // Profil page
+            const nameEl = document.querySelector('#page-profile h2.font-serif');
+            if (nameEl) nameEl.innerText = userProfile.pseudo || 'Flaneur';
+
+            const levelEl = document.querySelector('#page-profile p.text-stone-400');
+            if (levelEl) {
+                const xp = userProfile.xp || 0;
+                const level = getLevel(xp);
+                levelEl.innerText = level.title + ' - Niveau ' + level.num;
+            }
+
+            // XP bar
+            const xpEl = document.querySelector('#page-profile .font-black.text-stone-900, span[id="xp-val"]');
+            if (xpEl) xpEl.innerText = 'XP : ' + (userProfile.xp || 0);
+
+            // Bouton deconnexion dans le profil
+            const profileStats = document.querySelector('#page-profile .space-y-4');
+            if (profileStats && !document.getElementById('logout-btn-profile')) {
+                const logoutDiv = document.createElement('div');
+                logoutDiv.innerHTML = '<button id="logout-btn-profile" onclick="handleLogout()" class="w-full mt-4 py-4 rounded-3xl border-2 border-rose-100 text-rose-500 text-xs font-black uppercase tracking-widest active:scale-95 transition-transform">Se deconnecter</button>';
+                profileStats.appendChild(logoutDiv);
+            }
+        }
+
+        function getLevel(xp) {
+            if (xp < 100) return { num: 1, title: 'Touriste' };
+            if (xp < 300) return { num: 2, title: 'Curieux' };
+            if (xp < 600) return { num: 3, title: 'Flaneur' };
+            if (xp < 1200) return { num: 5, title: 'Local Expert' };
+            if (xp < 2500) return { num: 8, title: 'Connaisseur' };
+            return { num: 14, title: 'Legende Parisienne' };
+        }
+
+        // ============================================================
+        // ONBOARDING
+        // ============================================================
+
+        let obData = {
+            pseudo: '', city: 'Paris', avatar_seed: 'Felix',
+            vibes: [], budget: 2, timing: [], company: [], quartiers: [], persona: ''
+        };
+
+        function startOnboarding() {
+            // Pre-remplir le pseudo
+            if (userProfile && userProfile.pseudo) {
+                const obPseudo = document.getElementById('ob-pseudo');
+                if (obPseudo) obPseudo.value = userProfile.pseudo;
+            }
+            document.getElementById('onboarding-wall').style.display = 'flex';
+            obGoTo(1);
+        }
+
+        function obGoTo(step) {
+            document.querySelectorAll('.onboarding-step').forEach(s => s.classList.remove('active'));
+            const el = document.getElementById('ob-step-' + step);
+            if (el) el.classList.add('active');
+            const progress = document.getElementById('ob-progress');
+            if (progress) progress.style.width = (step * 20) + '%';
+            lucide.createIcons();
+        }
+
+        function obNext(nextStep) {
+            // Sauvegarder les donnees de l'etape courante
+            collectObStep(nextStep - 1);
+            obGoTo(nextStep);
+        }
+
+        function obBack(prevStep) {
+            obGoTo(prevStep);
+        }
+
+        function collectObStep(step) {
+            if (step === 1) {
+                obData.pseudo = document.getElementById('ob-pseudo').value.trim() || userProfile?.pseudo || 'Flaneur';
+                obData.city = document.getElementById('ob-city').value;
+                obData.avatar_seed = selectedAvatarSeed;
+            }
+            if (step === 2) {
+                obData.vibes = getSelectedChips('vibes-picker');
+            }
+            if (step === 3) {
+                const budgetSel = document.querySelector('#budget-ob-picker .vibe-chip.selected');
+                obData.budget = budgetSel ? parseInt(budgetSel.dataset.val) : 2;
+                obData.timing = getSelectedChips('timing-picker');
+                obData.company = getSelectedChips('company-picker');
+            }
+            if (step === 4) {
+                obData.quartiers = getSelectedChips('quartiers-picker');
+            }
+        }
+
+        function getSelectedChips(containerId) {
+            const chips = document.querySelectorAll('#' + containerId + ' .vibe-chip.selected');
+            return Array.from(chips).map(c => c.dataset.val);
+        }
+
+        async function finishOnboarding() {
+            // Collecter etape 5
+            collectObStep(4);
+            const personaSel = document.querySelector('#persona-picker .vibe-chip.selected');
+            obData.persona = personaSel ? personaSel.dataset.val : 'explorateur';
+            obData.pseudo = obData.pseudo || document.getElementById('ob-pseudo').value.trim() || 'Flaneur';
+
+            const btn = document.getElementById('ob-finish-btn');
+            if (btn) { btn.disabled = true; btn.innerText = 'Sauvegarde...'; }
+
+            const { error } = await supabaseClient
+                .from('profiles')
+                .update({
+                    pseudo: obData.pseudo,
+                    city: obData.city,
+                    avatar_seed: obData.avatar_seed,
+                    vibes: obData.vibes,
+                    budget_pref: obData.budget,
+                    timing_pref: obData.timing,
+                    company_pref: obData.company,
+                    quartiers_pref: obData.quartiers,
+                    persona: obData.persona,
+                    onboarding_done: true,
+                    xp: 50  // XP de bienvenue
+                })
+                .eq('id', currentUser.id);
+
+            if (error) {
+                if (btn) { btn.disabled = false; btn.innerText = 'Lancer ma flanerie'; }
+                showToast('Erreur sauvegarde...');
+                console.error(error);
+                return;
+            }
+
+            // Recharger le profil
+            const { data: updatedProfile } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+            userProfile = updatedProfile;
+
+            showToast('Bienvenue ' + obData.pseudo + ' ! +50 XP offerts &#x1F525;');
+            enterApp();
+        }
+
+        // --- UI Helpers onboarding ---
+        function selectAvatar(el) {
+            document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedAvatarSeed = el.dataset.seed;
+        }
+
+        function toggleChip(el) {
+            el.classList.toggle('selected');
+        }
+
+        function selectSingle(el, containerId) {
+            document.querySelectorAll('#' + containerId + ' .vibe-chip').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        // ============================================================
+        // PERSONNALISATION DU FEED (recommandations)
+        // ============================================================
+
+        // Override fetchSpots pour personnaliser selon le profil
+        const _originalFetchSpots = fetchSpots;
+
+        async function fetchSpotsPersonalized() {
+            const feed = document.getElementById('activity-feed');
+            if (!feed) return;
+
+            let query = supabaseClient.from('spots').select('*');
+
+            // Filtrer par vibes si profil existe
+            if (userProfile && userProfile.vibes && userProfile.vibes.length > 0) {
+                const vibeToCategory = {
+                    'bar': 'Bar', 'vin': 'Bar', 'restaurant': 'Restaurant',
+                    'cafe': 'Cafe', 'brunch': 'Cafe', 'rooftop': 'Bar',
+                    'jazz': 'Bar', 'club': 'Club', 'boulangerie': 'Boulangerie',
+                    'streetfood': 'Restaurant', 'nature': 'Spot'
+                };
+                const cats = [...new Set(userProfile.vibes.map(v => vibeToCategory[v]).filter(Boolean))];
+                if (cats.length > 0) {
+                    query = query.in('category', cats);
+                }
+            }
+
+            // Filtrer par budget si profil existe
+            if (userProfile && userProfile.budget_pref) {
+                const budgetMap = { 1: ['$'], 2: ['$', '$$'], 3: ['$', '$$', '$$$', '$$$$'] };
+                const allowed = budgetMap[userProfile.budget_pref] || ['$', '$$', '$$$'];
+                query = query.in('price_level', allowed);
+            }
+
+            // Trier par note
+            query = query.order('rating', { ascending: false }).limit(50);
+
+            const { data: spots, error } = await query;
+            feed.innerHTML = '';
+
+            if (spots && spots.length > 0) {
+                markersLayer.clearLayers();
+
+                // Titre personnalise
+                const feedTitle = document.querySelector('#page-home h2.font-serif');
+                if (feedTitle && userProfile) {
+                    feedTitle.innerHTML = userProfile.persona === 'noctambule'
+                        ? 'Spots de Nuit &#x1F319;'
+                        : userProfile.persona === 'epicurien'
+                        ? 'Les Meilleures Adresses &#x1F942;'
+                        : userProfile.persona === 'zen'
+                        ? 'Tes Havres de Paix &#x2615;'
+                        : 'Pour toi ce soir &#x2728;';
+                }
+
+                spots.forEach(spot => {
+                    feed.innerHTML += '<div class="bg-white rounded-[2.5rem] p-5 border border-stone-100 shadow-sm">'
+                        + '<div class="flex items-center gap-3 mb-4">'
+                        + '<div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center font-bold text-emerald-800">' + (spot.name ? spot.name[0] : '?') + '</div>'
+                        + '<div>'
+                        + '<h4 class="text-sm font-black text-stone-900">' + (spot.name || 'Nom inconnu') + '</h4>'
+                        + '<span class="text-[9px] text-stone-400 font-bold uppercase">' + (spot.category || 'Spot') + '</span>'
+                        + '</div></div>'
+                        + '<p class="text-sm text-stone-600 italic mb-4">"' + (spot.address || 'Adresse introuvable') + '"</p>'
+                        + '<div class="flex justify-between items-center">'
+                        + '<div class="flex items-center gap-2">'
+                        + '<span class="text-emerald-700 font-black">' + (spot.price_level || '$$') + '</span>'
+                        + (spot.rating ? '<span class="text-[10px] text-stone-400 font-bold">&#x2605; ' + spot.rating + '</span>' : '')
+                        + '</div>'
+                        + '<button onclick="viewOnMap(' + (spot.lat || 48.8566) + ', ' + (spot.lng || 2.3522) + ')" class="text-[10px] font-black uppercase bg-stone-100 text-stone-600 px-3 py-1 rounded-full active:scale-95 transition-transform">Voir sur la carte</button>'
+                        + '</div></div>';
+
+                    if (spot.lat && spot.lng) {
+                        const marker = L.marker([spot.lat, spot.lng]).bindPopup(
+                            '<div class="text-center p-1"><h4 class="text-sm font-black text-stone-900 leading-tight mb-1">' + spot.name + '</h4>'
+                            + '<span class="text-[9px] text-stone-500 font-bold uppercase">' + (spot.category || 'Spot') + ' &#x2022; ' + (spot.rating || 'N/A') + '&#x2605;</span></div>'
+                        );
+                        markersLayer.addLayer(marker);
+                    }
+                });
+
+                if (markersLayer.getLayers().length > 0) {
+                    map.fitBounds(markersLayer.getBounds(), { padding: [30, 30] });
+                }
+            } else {
+                // Fallback : tous les spots
+                _originalFetchSpots();
+            }
+        }
+
+        // Remplacer fetchSpots par la version personnalisee
+        window.fetchSpots = fetchSpotsPersonalized;
+
+        // ============================================================
+        // INIT : verifier la session au demarrage
+        // ============================================================
+        (async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session && session.user) {
+                currentUser = session.user;
+                await loadOrInitProfile();
+            } else {
+                // Pas connecte -> montrer l'auth wall
+                document.getElementById('auth-wall').classList.remove('hidden');
+                lucide.createIcons();
+            }
+        })();
+
 
     </script>
 </body>

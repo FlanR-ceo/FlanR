@@ -209,7 +209,7 @@
                             <span class="w-2 h-2 rounded-full bg-orange-500 z-10"></span>
                             <span class="absolute w-4 h-4 rounded-full bg-orange-500/30 ripple"></span>
                         </div>
-                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700" id="header-streak">0 Jour de Série 🔥</p>
+                        <p id="header-streak" class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700">0 Jour de Série 🔥</p>
                     </div>
                     <h1 class="text-3xl font-serif font-black tracking-tighter text-emerald-950 leading-none">FLANR</h1>
                 </div>
@@ -218,7 +218,7 @@
                         <i data-lucide="award" class="w-5 h-5 text-emerald-700"></i>
                     </button>
                     <button class="w-10 h-10 rounded-full border-2 border-white shadow-md overflow-hidden bg-stone-200" onclick="showPage('profile')">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profil">
+                        <img id="header-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profil">
                     </button>
                 </div>
             </div>
@@ -348,92 +348,72 @@
         <main id="page-listes" class="page px-6 pt-6 pb-40 overflow-y-auto">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-2xl font-serif font-black text-emerald-950 italic">Mes Listes</h2>
-                <button onclick="openCreateList()" class="w-8 h-8 flex items-center justify-center bg-emerald-100 text-emerald-800 rounded-full active:scale-90 transition-transform">
+                <button onclick="showToast('Création de liste...')" class="w-8 h-8 flex items-center justify-center bg-emerald-100 text-emerald-800 rounded-full active:scale-90 transition-transform">
                     <i data-lucide="plus" class="w-4 h-4"></i>
                 </button>
             </div>
-            <div id="lists-container" class="space-y-4">
-                <div class="flex flex-col items-center justify-center py-16 text-center">
-                    <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mb-4">
-                        <i data-lucide="layers" class="w-7 h-7 text-stone-300"></i>
+            
+            <div class="space-y-4">
+                <div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center gap-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onclick="showToast('Ouverture de la liste...')">
+                    <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-700">
+                        <i data-lucide="sun" class="w-6 h-6"></i>
                     </div>
-                    <p class="text-sm font-black text-stone-400 uppercase tracking-widest mb-1">Aucune liste</p>
-                    <p class="text-xs text-stone-300 font-medium mb-6">Crée ta première liste de spots</p>
-                    <button onclick="openCreateList()" class="px-6 py-3 bg-emerald-950 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-transform">+ Créer une liste</button>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-black text-stone-900">Terrasses Secrètes</h4>
+                        <p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">0 spots</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-stone-300"></i>
+                </div>
+                
+                <div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center gap-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onclick="showToast('Ouverture de la liste...')">
+                    <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-700">
+                        <i data-lucide="coffee" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-black text-stone-900">Brunchs validés</h4>
+                        <p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">0 spots</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-stone-300"></i>
                 </div>
             </div>
         </main>
-
-        <!-- MODAL CRÉATION LISTE -->
-        <div id="create-list-overlay" class="fixed inset-0 bg-stone-950/60 backdrop-blur-sm z-[200] opacity-0 pointer-events-none transition-opacity duration-300">
-            <div id="create-list-modal" class="log-modal absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-[#FDFCF8] rounded-t-[3rem] p-8 pb-12 shadow-[0_-20px_50px_rgba(0,0,0,0.2)]">
-                <div class="w-12 h-1.5 bg-stone-200 rounded-full mx-auto mb-8"></div>
-                <div class="flex justify-between items-start mb-8">
-                    <div>
-                        <h2 class="text-2xl font-serif font-black text-stone-900 leading-none">Nouvelle Liste</h2>
-                        <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1">Organise tes spots favoris</p>
-                    </div>
-                    <button onclick="closeCreateList()" class="w-10 h-10 flex items-center justify-center bg-stone-100 rounded-full active:scale-90 transition-transform">
-                        <i data-lucide="x" class="w-5 h-5 text-stone-600"></i>
-                    </button>
-                </div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Nom de la liste</label>
-                        <input id="new-list-name" type="text" placeholder="Ex: Terrasses secrètes..." class="w-full px-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3">Icône</label>
-                        <div class="flex gap-3 flex-wrap" id="list-icon-picker">
-                            <div class="vibe-chip selected" onclick="selectSingle(this,'list-icon-picker')" data-val="sun">☀️</div>
-                            <div class="vibe-chip" onclick="selectSingle(this,'list-icon-picker')" data-val="coffee">☕</div>
-                            <div class="vibe-chip" onclick="selectSingle(this,'list-icon-picker')" data-val="heart">❤️</div>
-                            <div class="vibe-chip" onclick="selectSingle(this,'list-icon-picker')" data-val="star">⭐</div>
-                            <div class="vibe-chip" onclick="selectSingle(this,'list-icon-picker')" data-val="moon">🌙</div>
-                            <div class="vibe-chip" onclick="selectSingle(this,'list-icon-picker')" data-val="zap">⚡</div>
-                        </div>
-                    </div>
-                    <button onclick="saveNewList()" class="w-full bg-emerald-950 text-white py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-200 active:scale-95 transition-transform mt-2">Créer la liste</button>
-                </div>
-            </div>
-        </div>
 
         <!-- 4. PROFIL / TROPHÉES -->
         <main id="page-profile" class="page px-6 pt-6 pb-40 overflow-y-auto">
             <div class="flex flex-col items-center text-center mb-10">
                 <div class="relative">
                     <div class="w-28 h-28 rounded-full border-4 border-emerald-100 p-1 mb-4 shadow-xl">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" class="w-full h-full rounded-full bg-stone-100">
+                        <img id="profile-avatar-img" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" class="w-full h-full rounded-full bg-stone-100">
                     </div>
                     <div class="absolute bottom-4 right-0 bg-orange-500 text-white w-10 h-10 rounded-full border-4 border-[#FDFCF8] flex items-center justify-center shadow-lg streak-fire animate-float">
                         <i data-lucide="flame" class="w-5 h-5 fill-current"></i>
                     </div>
                 </div>
-                <h2 class="text-2xl font-serif font-black text-stone-900">Félix l'Explorateur</h2>
-                <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-[0.2em] mb-6">Expert Flâneur • Niveau 14</p>
+                <h2 id="profile-name" class="text-2xl font-serif font-black text-stone-900">Nouveau Flâneur</h2>
+                <p id="profile-level" class="text-[10px] font-extrabold text-stone-400 uppercase tracking-[0.2em] mb-6">Flâneur Débutant • Niveau 1</p>
                 
                 <!-- Barre de Niveau -->
                 <div class="w-full max-w-[200px] mb-8">
                     <div class="flex justify-between text-[8px] font-black uppercase text-emerald-800 mb-1">
-                        <span>XP : 1240</span>
-                        <span>Niv. 15 : 1500</span>
+                        <span id="profile-xp">XP : 0</span>
+                        <span>Niv. 2 : 200</span>
                     </div>
                     <div class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
-                        <div class="w-[82%] h-full bg-emerald-600 rounded-full"></div>
+                        <div id="profile-xp-bar" class="w-[0%] h-full bg-emerald-600 rounded-full"></div>
                     </div>
                 </div>
 
                 <div class="flex gap-8 border-y border-stone-100 w-full py-6">
                     <div class="flex-1 text-center">
-                        <p id="stat-spots" class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
+                        <p class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
                         <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Spots</p>
                     </div>
                     <div class="flex-1 text-center border-x border-stone-100">
-                        <p id="stat-streak" class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
+                        <p class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
                         <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Série</p>
                     </div>
                     <div class="flex-1 text-center">
-                        <p id="stat-listes" class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
+                        <p class="text-2xl font-serif font-black text-emerald-950 leading-none">0</p>
                         <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Listes</p>
                     </div>
                 </div>
@@ -442,19 +422,19 @@
             <!-- Badges de Spécialiste -->
             <h3 class="text-sm font-black uppercase tracking-[0.2em] text-stone-400 mb-6 px-2 italic">Mes Trophées</h3>
             <div class="grid grid-cols-3 gap-6 mb-12">
-                <div onclick="showToast('Visite 5 terrasses pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
+                <div onclick="showToast('Visitez des terrasses pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
                     <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center text-stone-400 border border-stone-200">
                         <i data-lucide="sun" class="w-8 h-8"></i>
                     </div>
                     <span class="text-[8px] font-black uppercase text-stone-400">Terrasses</span>
                 </div>
-                <div onclick="showToast('Visite 3 bars de nuit pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
+                <div onclick="showToast('Visitez 3 bars de nuit pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
                     <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center text-stone-400 border border-stone-200">
                         <i data-lucide="moon" class="w-8 h-8"></i>
                     </div>
                     <span class="text-[8px] font-black uppercase text-stone-400">Night Owl</span>
                 </div>
-                <div onclick="showToast('Visite 10 cafés pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
+                <div onclick="showToast('Visitez des cafés pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
                     <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center text-stone-400 border border-stone-200">
                         <i data-lucide="coffee" class="w-8 h-8"></i>
                     </div>
@@ -462,18 +442,19 @@
                 </div>
             </div>
 
-            <!-- Stats -->
-            <div class="space-y-4" id="profile-stats-section">
-                <div class="p-5 bg-stone-50 border border-stone-100 rounded-3xl flex items-center justify-between">
+            <!-- Stats Sociales -->
+            <div class="space-y-4">
+                <div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-stone-100 rounded-xl flex items-center justify-center text-stone-300">
+                        <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
                             <i data-lucide="trending-up" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <p class="text-xs font-black text-stone-400">Quartier de Prédilection</p>
-                            <p class="text-[10px] font-bold text-stone-300 uppercase tracking-tighter">Commence à explorer !</p>
+                            <p class="text-xs font-black text-stone-900">Quartier de Prédilection</p>
+                            <p class="text-[10px] font-bold text-stone-400 uppercase tracking-tighter">Aucune visite pour l'instant</p>
                         </div>
                     </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-stone-200"></i>
                 </div>
             </div>
         </main>
@@ -514,17 +495,17 @@
                         <div class="bg-stone-50 p-4 rounded-3xl">
                             <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center">Verdict</label>
                             <div id="log-stars" class="flex justify-center gap-1 cursor-pointer">
-                                <i data-lucide="star" data-val="1" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
-                                <i data-lucide="star" data-val="2" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
-                                <i data-lucide="star" data-val="3" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
-                                <i data-lucide="star" data-val="4" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
+                                <i data-lucide="star" data-val="1" class="w-5 h-5 text-stone-200 star-btn"></i>
+                                <i data-lucide="star" data-val="2" class="w-5 h-5 text-stone-200 star-btn"></i>
+                                <i data-lucide="star" data-val="3" class="w-5 h-5 text-stone-200 star-btn"></i>
+                                <i data-lucide="star" data-val="4" class="w-5 h-5 text-stone-200 star-btn"></i>
                                 <i data-lucide="star" data-val="5" class="w-5 h-5 text-stone-200 star-btn"></i>
                             </div>
                         </div>
                         <div class="bg-stone-50 p-4 rounded-3xl cursor-pointer select-none" onclick="cycleBudget()">
                             <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center cursor-pointer">Budget</label>
                             <div class="flex justify-center gap-2">
-                                <span id="budget-display" class="text-sm font-black text-emerald-950">$$$</span>
+                                <span id="budget-display" class="text-sm font-black text-emerald-950">$</span>
                             </div>
                         </div>
                     </div>
@@ -951,7 +932,7 @@
         // 7. Sélecteur de Budget Interactif
         const budgetDisplay = document.getElementById('budget-display');
         const budgets = ["$", "$$", "$$$"];
-        let currentBudgetIndex = 2; // Par défaut sur $$$
+        let currentBudgetIndex = 0; // Par défaut sur $
         function cycleBudget() {
             currentBudgetIndex = (currentBudgetIndex + 1) % budgets.length;
             budgetDisplay.innerText = budgets[currentBudgetIndex];
@@ -1072,125 +1053,6 @@
 
         // Appeler la fonction au chargement
         fetchSpots();
-
-        // ============================================================
-        // SYSTÈME DE LISTES RÉELLES
-        // ============================================================
-
-        function openCreateList() {
-            const overlay = document.getElementById('create-list-overlay');
-            const modal = document.getElementById('create-list-modal');
-            overlay.classList.remove('pointer-events-none');
-            overlay.classList.add('opacity-100');
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            lucide.createIcons();
-        }
-
-        function closeCreateList() {
-            const overlay = document.getElementById('create-list-overlay');
-            const modal = document.getElementById('create-list-modal');
-            overlay.classList.add('pointer-events-none');
-            overlay.classList.remove('opacity-100');
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        document.getElementById('create-list-overlay').onclick = function(e) {
-            if (e.target === this) closeCreateList();
-        };
-
-        async function saveNewList() {
-            if (!currentUser) { showToast('Connecte-toi pour créer une liste'); return; }
-            const name = document.getElementById('new-list-name').value.trim();
-            if (!name) { showToast('Donne un nom à ta liste'); return; }
-            const iconEl = document.querySelector('#list-icon-picker .vibe-chip.selected');
-            const icon = iconEl ? iconEl.dataset.val : 'star';
-
-            const { error } = await supabaseClient
-                .from('lists')
-                .insert([{ user_id: currentUser.id, name, icon }]);
-
-            if (!error) {
-                showToast('Liste créée ! 🎉');
-                document.getElementById('new-list-name').value = '';
-                closeCreateList();
-                fetchLists();
-            } else {
-                showToast('Erreur création liste...');
-                console.error(error);
-            }
-        }
-
-        const iconMap = {
-            sun: '☀️', coffee: '☕', heart: '❤️',
-            star: '⭐', moon: '🌙', zap: '⚡'
-        };
-
-        async function fetchLists() {
-            if (!currentUser) return;
-            const container = document.getElementById('lists-container');
-            const { data: lists, error } = await supabaseClient
-                .from('lists')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-
-            if (!lists || lists.length === 0) {
-                container.innerHTML = '<div class="flex flex-col items-center justify-center py-16 text-center">'
-                    + '<div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mb-4">'
-                    + '<i data-lucide="layers" class="w-7 h-7 text-stone-300"></i></div>'
-                    + '<p class="text-sm font-black text-stone-400 uppercase tracking-widest mb-1">Aucune liste</p>'
-                    + '<p class="text-xs text-stone-300 font-medium mb-6">Crée ta première liste de spots</p>'
-                    + '<button onclick="openCreateList()" class="px-6 py-3 bg-emerald-950 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl active:scale-95 transition-transform">+ Créer une liste</button>'
-                    + '</div>';
-                lucide.createIcons();
-                // Update stat
-                const statListes = document.getElementById('stat-listes');
-                if (statListes) statListes.innerText = '0';
-                return;
-            }
-
-            container.innerHTML = '';
-            lists.forEach(list => {
-                container.innerHTML += '<div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center gap-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer">'
-                    + '<div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-2xl">' + (iconMap[list.icon] || '⭐') + '</div>'
-                    + '<div class="flex-1">'
-                    + '<h4 class="text-sm font-black text-stone-900">' + list.name + '</h4>'
-                    + '<p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">0 spots</p>'
-                    + '</div>'
-                    + '<i data-lucide="chevron-right" class="w-5 h-5 text-stone-300"></i>'
-                    + '</div>';
-            });
-
-            // Update stat
-            const statListes = document.getElementById('stat-listes');
-            if (statListes) statListes.innerText = lists.length;
-        }
-
-        // ============================================================
-        // STATS PROFIL RÉELLES
-        // ============================================================
-
-        async function fetchProfileStats() {
-            if (!currentUser) return;
-
-            // Nombre de logs
-            const { count: logsCount } = await supabaseClient
-                .from('logs')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', currentUser.id);
-
-            const statSpots = document.getElementById('stat-spots');
-            if (statSpots) statSpots.innerText = logsCount || 0;
-
-            // Streak depuis le profil
-            const statStreak = document.getElementById('stat-streak');
-            if (statStreak && userProfile) statStreak.innerText = userProfile.streak_days || 0;
-
-            // Listes
-            fetchLists();
-        }
 
         // ============================================================
         // SYSTEME AUTH & ONBOARDING FLANR
@@ -1334,35 +1196,47 @@
         function applyProfileToApp() {
             if (!userProfile) return;
 
-            // Avatar dans le header
             const avatarSrc = 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (userProfile.avatar_seed || 'Felix');
-            document.querySelectorAll('img[alt="Profil"], img[alt="Felix"]').forEach(img => {
-                img.src = avatarSrc;
-            });
 
-            // Streak dans le header
-            const streakEl = document.querySelector('.text-orange-700');
-            if (streakEl && userProfile.streak_days !== undefined) {
+            // Avatar header
+            const headerAvatar = document.getElementById('header-avatar');
+            if (headerAvatar) headerAvatar.src = avatarSrc;
+
+            // Avatar profil
+            const profileAvatarImg = document.getElementById('profile-avatar-img');
+            if (profileAvatarImg) profileAvatarImg.src = avatarSrc;
+
+            // Streak header
+            const streakEl = document.getElementById('header-streak');
+            if (streakEl) {
                 const s = userProfile.streak_days || 0;
                 streakEl.innerHTML = s + ' Jour' + (s > 1 ? 's' : '') + ' de Serie &#x1F525;';
             }
 
-            // Profil page
-            const nameEl = document.querySelector('#page-profile h2.font-serif');
+            // Nom profil
+            const nameEl = document.getElementById('profile-name');
             if (nameEl) nameEl.innerText = userProfile.pseudo || 'Flaneur';
 
-            const levelEl = document.querySelector('#page-profile p.text-stone-400');
+            // Niveau profil
+            const levelEl = document.getElementById('profile-level');
             if (levelEl) {
-                const xp = userProfile.xp || 0;
-                const level = getLevel(xp);
-                levelEl.innerText = level.title + ' - Niveau ' + level.num;
+                const level = getLevel(userProfile.xp || 0);
+                levelEl.innerText = level.title + ' • Niveau ' + level.num;
             }
 
-            // XP bar
-            const xpEl = document.querySelector('#page-profile .font-black.text-stone-900, span[id="xp-val"]');
+            // XP
+            const xpEl = document.getElementById('profile-xp');
             if (xpEl) xpEl.innerText = 'XP : ' + (userProfile.xp || 0);
 
-            // Bouton deconnexion dans le profil
+            // XP bar
+            const xpBar = document.getElementById('profile-xp-bar');
+            if (xpBar) {
+                const xp = userProfile.xp || 0;
+                const pct = Math.min(100, Math.round((xp % 500) / 500 * 100));
+                xpBar.style.width = pct + '%';
+            }
+
+            // Bouton deconnexion
             const profileStats = document.querySelector('#page-profile .space-y-4');
             if (profileStats && !document.getElementById('logout-btn-profile')) {
                 const logoutDiv = document.createElement('div');

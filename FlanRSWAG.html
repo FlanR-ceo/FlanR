@@ -1,0 +1,705 @@
+﻿
+
+Aller au contenu
+Utiliser Gmail avec un lecteur d'écran
+Conversations
+9 % sur 15 Go utilisés
+Conditions d'utilisation · Confidentialité · Règlement du programme
+Dernière activité sur le compte : il y a 0 minute
+Ce compte est ouvert depuis 2 autres emplacements. · Détails
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Flanr - L'expérience urbaine ultime</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Ajout du SDK Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Ajout de Leaflet pour la carte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,900;1,8..60,600;1,8..60,900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FDFCF8;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .font-serif { font-family: 'Source Serif 4', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Navigation (Pages) */
+        .page { display: none; opacity: 0; transform: translateY(10px); transition: all 0.3s ease-out; }
+        .page.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        /* Modal Log Drawer */
+        .log-modal {
+            transform: translateY(100%);
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .log-modal.active { transform: translateY(0); }
+        
+        /* Navigation active state */
+        .tab-active { color: #064e3b; }
+        .tab-active i { stroke-width: 3px; transform: scale(1.1); }
+
+        /* Effets visuels */
+        .streak-fire { filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.4)); }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-float { animation: float 3s infinite ease-in-out; }
+
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        .ripple { animation: ripple 2s infinite; }
+
+        /* Toasts (Notifications) */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            background: #064e3b;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(6, 78, 59, 0.3);
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Style popup de la carte */
+        .leaflet-popup-content-wrapper { border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .leaflet-popup-content { font-family: 'Plus Jakarta Sans', sans-serif; margin: 12px; }
+    </style>
+</head>
+<body class="text-stone-900 leading-relaxed overflow-x-hidden selection:bg-emerald-100">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Notification</div>
+
+    <div class="max-w-md mx-auto min-h-screen flex flex-col relative shadow-2xl bg-[#FDFCF8] overflow-hidden">
+        
+        <!-- HEADER GLOBAL -->
+        <header class="px-6 pt-12 pb-4 sticky top-0 bg-[#FDFCF8]/90 backdrop-blur-xl z-40 border-b border-stone-100">
+            <div class="flex justify-between items-end">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <div class="relative flex items-center justify-center">
+                            <span class="w-2 h-2 rounded-full bg-orange-500 z-10"></span>
+                            <span class="absolute w-4 h-4 rounded-full bg-orange-500/30 ripple"></span>
+                        </div>
+                        <p class="text-[10px] font-black uppercase tracking-[0.2em] text-orange-700">6 Semaines de Série 🔥</p>
+                    </div>
+                    <h1 class="text-3xl font-serif font-black tracking-tighter text-emerald-950 leading-none">FLANR</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="showToast('Vos récompenses arrivent bientôt !')" class="relative w-10 h-10 flex items-center justify-center bg-stone-100 text-stone-600 rounded-full active:scale-90 transition-transform">
+                        <i data-lucide="award" class="w-5 h-5 text-emerald-700"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-full border-2 border-white shadow-md overflow-hidden bg-stone-200" onclick="showPage('profile')">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Profil">
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 1. ACCUEIL (FLUX) -->
+        <main id="page-home" class="page active px-6 pt-6 pb-40 overflow-y-auto">
+            
+            <!-- Défi Hebdo -->
+            <section class="mb-10 bg-emerald-950 rounded-[2.5rem] p-6 text-white relative overflow-hidden shadow-2xl shadow-emerald-900/20">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="px-3 py-1 bg-emerald-800 rounded-full text-[9px] font-black uppercase tracking-[0.2em]">Défi de la Semaine</span>
+                        <div class="flex items-center gap-1 text-emerald-400">
+                            <i data-lucide="timer" class="w-3 h-3"></i>
+                            <span class="text-[9px] font-bold">2j restants</span>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-serif font-bold mb-1">Le Tour des Speakeasies</h3>
+                    <p class="text-emerald-300/80 text-[11px] font-medium leading-relaxed mb-5">Découvre 3 bars cachés pour gagner le badge "Ninja de la Nuit".</p>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="flex-1 h-2 bg-emerald-900 rounded-full overflow-hidden">
+                            <div class="w-2/3 h-full bg-emerald-400 rounded-full"></div>
+                        </div>
+                        <span class="text-[10px] font-black">2 / 3</span>
+                    </div>
+                </div>
+                <i data-lucide="zap" class="absolute -bottom-6 -right-6 w-32 h-32 text-white/5 rotate-12"></i>
+            </section>
+
+            <!-- Barre de Recherche -->
+            <div class="flex gap-2 mb-8">
+                <div class="relative flex-1 group">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-300 w-5 h-5 group-focus-within:text-emerald-600 transition-colors"></i>
+                    <input type="text" placeholder="Un bar, une expo, une vibe..." class="w-full pl-12 pr-4 py-4 bg-white border border-stone-100 rounded-2xl shadow-sm text-sm font-medium focus:ring-2 focus:ring-emerald-100 outline-none transition-all">
+                </div>
+                <button onclick="showToast('Mode Découverte activé !')" class="w-14 h-14 flex items-center justify-center bg-stone-900 text-white rounded-2xl shadow-lg active:scale-95 transition-transform">
+                    <i data-lucide="sparkles" class="w-6 h-6 animate-pulse"></i>
+                </button>
+            </div>
+
+            <!-- Vibe Map Preview -->
+            <section class="mb-10 p-5 bg-white border border-stone-100 rounded-[2.5rem] relative overflow-hidden shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onclick="showPage('explore')">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-serif font-bold text-stone-800 italic">Vibe Map Paris</h3>
+                        <span class="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full uppercase">En Direct</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2 h-16 mb-4 items-end">
+                        <div class="bg-stone-100 rounded-xl h-[40%]"></div>
+                        <div class="bg-emerald-100 rounded-xl h-[70%]"></div>
+                        <div class="bg-emerald-500 rounded-xl h-[100%] relative">
+                            <div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                        <div class="bg-emerald-200 rounded-xl h-[60%]"></div>
+                    </div>
+                    <p class="text-[10px] font-bold text-stone-400 text-center uppercase tracking-widest">Le 11ème est très animé ce soir</p>
+                </div>
+            </section>
+
+            <!-- Flux d'Activités -->
+            <h2 class="text-xl font-serif font-bold text-stone-800 mb-6 px-2 italic underline decoration-emerald-200 decoration-4 underline-offset-4">Journal de Bord</h2>
+            
+            <div id="activity-feed" class="space-y-6">
+                <!-- Les cartes Supabase s'afficheront ici -->
+                <p class="text-sm text-stone-400 text-center italic py-10">Chargement des spots...</p>
+            </div>
+            
+        </main>
+
+        <!-- 2. EXPLORER / MAP -->
+        <main id="page-explore" class="page px-6 pt-6 pb-40 overflow-y-auto">
+            <h2 class="text-2xl font-serif font-black text-emerald-950 mb-2 italic">Explorer Paris</h2>
+            <p class="text-xs font-bold text-stone-400 uppercase tracking-widest mb-8">Découvre ta prochaine obsession</p>
+            
+            <!-- La Carte Interactive -->
+            <div class="mb-8 rounded-[2rem] overflow-hidden border border-stone-200 shadow-sm relative z-0 h-72 bg-stone-100">
+                <div id="map" class="w-full h-full"></div>
+            </div>
+            
+            <!-- Quêtes de Proximité -->
+            <div class="mb-10">
+                <h3 class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-4 flex items-center gap-2">
+                    <i data-lucide="map-pin" class="w-4 h-4"></i> Quêtes à proximité
+                </h3>
+                <div class="bg-white border border-stone-100 rounded-3xl p-5 shadow-sm relative overflow-hidden group active:scale-[0.98] transition-all">
+                    <div class="relative z-10">
+                        <h4 class="text-md font-bold text-stone-900 mb-1">Expert de la Bastille</h4>
+                        <p class="text-[10px] text-stone-400 font-bold uppercase mb-4">Visite encore 2 bars dans ce quartier</p>
+                        <button id="quest-btn" onclick="toggleQuest(this)" class="px-4 py-2 bg-stone-900 text-white text-[9px] font-black uppercase tracking-widest rounded-xl transition-all active:scale-95">Lancer la quête</button>
+                    </div>
+                    <i data-lucide="compass" class="absolute -bottom-4 -right-4 w-20 h-20 text-stone-50 group-hover:text-emerald-50 transition-colors"></i>
+                </div>
+            </div>
+
+            <!-- Catégories Grille -->
+            <div class="grid grid-cols-2 gap-4">
+                <div onclick="showToast('Recherche autour de vous...')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-emerald-50 transition-colors cursor-pointer">
+                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 mb-3">
+                        <i data-lucide="navigation-2" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-stone-800">Autour de moi</span>
+                </div>
+                <div onclick="showToast('Catégorie Cafés sélectionnée')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-orange-50 transition-colors cursor-pointer">
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 mb-3">
+                        <i data-lucide="coffee" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-stone-800">Cafés & Co</span>
+                </div>
+                <div onclick="showToast('Catégorie Dates sélectionnée')" class="p-6 bg-white border border-stone-100 rounded-3xl flex flex-col items-center justify-center text-center shadow-sm active:bg-rose-50 transition-colors cursor-pointer">
+                    <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-700 mb-3">
+                        <i data-lucide="heart" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-stone-800">Dates Idéaux</span>
+                </div>
+                <div onclick="showToast('Chargement de la Carte Interactive...')" class="p-6 bg-stone-900 border border-stone-800 rounded-3xl flex flex-col items-center justify-center text-center shadow-lg active:scale-95 transition-transform cursor-pointer">
+                    <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-stone-900 mb-3 animate-pulse">
+                        <i data-lucide="map" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-white">Carte Live</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- 3. LISTES -->
+        <main id="page-listes" class="page px-6 pt-6 pb-40 overflow-y-auto">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-serif font-black text-emerald-950 italic">Mes Listes</h2>
+                <button onclick="showToast('Création de liste...')" class="w-8 h-8 flex items-center justify-center bg-emerald-100 text-emerald-800 rounded-full active:scale-90 transition-transform">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center gap-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onclick="showToast('Ouverture de la liste...')">
+                    <div class="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-700">
+                        <i data-lucide="sun" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-black text-stone-900">Terrasses Secrètes</h4>
+                        <p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">12 spots</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-stone-300"></i>
+                </div>
+                
+                <div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center gap-4 shadow-sm active:scale-[0.98] transition-transform cursor-pointer" onclick="showToast('Ouverture de la liste...')">
+                    <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-700">
+                        <i data-lucide="coffee" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-black text-stone-900">Brunchs validés</h4>
+                        <p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">8 spots</p>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-stone-300"></i>
+                </div>
+            </div>
+        </main>
+
+        <!-- 4. PROFIL / TROPHÉES -->
+        <main id="page-profile" class="page px-6 pt-6 pb-40 overflow-y-auto">
+            <div class="flex flex-col items-center text-center mb-10">
+                <div class="relative">
+                    <div class="w-28 h-28 rounded-full border-4 border-emerald-100 p-1 mb-4 shadow-xl">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Felix" class="w-full h-full rounded-full bg-stone-100">
+                    </div>
+                    <div class="absolute bottom-4 right-0 bg-orange-500 text-white w-10 h-10 rounded-full border-4 border-[#FDFCF8] flex items-center justify-center shadow-lg streak-fire animate-float">
+                        <i data-lucide="flame" class="w-5 h-5 fill-current"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-serif font-black text-stone-900">Félix l'Explorateur</h2>
+                <p class="text-[10px] font-extrabold text-stone-400 uppercase tracking-[0.2em] mb-6">Expert Flâneur • Niveau 14</p>
+                
+                <!-- Barre de Niveau -->
+                <div class="w-full max-w-[200px] mb-8">
+                    <div class="flex justify-between text-[8px] font-black uppercase text-emerald-800 mb-1">
+                        <span>XP : 1240</span>
+                        <span>Niv. 15 : 1500</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                        <div class="w-[82%] h-full bg-emerald-600 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div class="flex gap-8 border-y border-stone-100 w-full py-6">
+                    <div class="flex-1 text-center">
+                        <p class="text-2xl font-serif font-black text-emerald-950 leading-none">48</p>
+                        <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Spots</p>
+                    </div>
+                    <div class="flex-1 text-center border-x border-stone-100">
+                        <p class="text-2xl font-serif font-black text-emerald-950 leading-none">6</p>
+                        <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Série</p>
+                    </div>
+                    <div class="flex-1 text-center">
+                        <p class="text-2xl font-serif font-black text-emerald-950 leading-none">12</p>
+                        <p class="text-[8px] font-black uppercase text-stone-400 mt-1 tracking-widest">Listes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Badges de Spécialiste -->
+            <h3 class="text-sm font-black uppercase tracking-[0.2em] text-stone-400 mb-6 px-2 italic">Mes Trophées</h3>
+            <div class="grid grid-cols-3 gap-6 mb-12">
+                <div onclick="showToast('Trophée : Explorateur de Terrasses')" class="flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-700 shadow-sm transition-transform active:scale-90 border border-emerald-100">
+                        <i data-lucide="sun" class="w-8 h-8"></i>
+                    </div>
+                    <span class="text-[8px] font-black uppercase text-stone-800">Terrasses</span>
+                </div>
+                <div onclick="showToast('Visitez 3 bars de nuit pour débloquer !')" class="flex flex-col items-center gap-2 grayscale opacity-40 cursor-pointer">
+                    <div class="w-16 h-16 bg-stone-100 rounded-2xl flex items-center justify-center text-stone-400 border border-stone-200">
+                        <i data-lucide="moon" class="w-8 h-8"></i>
+                    </div>
+                    <span class="text-[8px] font-black uppercase text-stone-400">Night Owl</span>
+                </div>
+                <div onclick="showToast('Trophée : Accro à la Caféine')" class="flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-700 shadow-sm transition-transform active:scale-90 border border-orange-100">
+                        <i data-lucide="coffee" class="w-8 h-8"></i>
+                    </div>
+                    <span class="text-[8px] font-black uppercase text-stone-800">Caféiné</span>
+                </div>
+            </div>
+
+            <!-- Stats Sociales -->
+            <div class="space-y-4">
+                <div class="p-5 bg-white border border-stone-100 rounded-3xl flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-700">
+                            <i data-lucide="trending-up" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-black text-stone-900">Quartier de Prédilection</p>
+                            <p class="text-[10px] font-bold text-stone-400 uppercase tracking-tighter">Le Marais (14 visites)</p>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-stone-200"></i>
+                </div>
+            </div>
+        </main>
+
+        <!-- LOG MODAL (Le Formulaire Drawer) -->
+        <div id="log-overlay" class="fixed inset-0 bg-stone-950/60 backdrop-blur-sm z-[100] opacity-0 pointer-events-none transition-opacity duration-300">
+            <div id="log-modal" class="log-modal absolute bottom-0 left-0 right-0 max-w-md mx-auto bg-[#FDFCF8] rounded-t-[3rem] p-8 pb-12 shadow-[0_-20px_50px_rgba(0,0,0,0.2)] max-h-[90vh] overflow-y-auto no-scrollbar">
+                <div class="w-12 h-1.5 bg-stone-200 rounded-full mx-auto mb-8"></div>
+                
+                <div class="flex justify-between items-start mb-8">
+                    <div>
+                        <h2 class="text-2xl font-serif font-black text-stone-900 leading-none">Immortalisé</h2>
+                        <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1">+20 XP pour votre flânerie</p>
+                    </div>
+                    <button id="close-log" class="w-10 h-10 flex items-center justify-center bg-stone-100 rounded-full active:scale-90 transition-transform">
+                        <i data-lucide="x" class="w-5 h-5 text-stone-600"></i>
+                    </button>
+                </div>
+
+                <form id="log-form" class="space-y-8 pb-10">
+                    <!-- Lieu & Photo -->
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 italic">Où as-tu traîné ?</label>
+                            <div class="relative">
+                                <i data-lucide="map-pin" class="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-700 w-4 h-4"></i>
+                                <input type="text" required placeholder="Nom de l'établissement..." class="w-full pl-10 pr-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
+                            </div>
+                        </div>
+                        <div onclick="showToast('Ouverture de la galerie photo...')" class="w-24 h-24 bg-stone-100 border-2 border-dashed border-stone-200 rounded-2xl flex flex-col items-center justify-center text-stone-400 active:bg-emerald-50 transition-colors cursor-pointer">
+                            <i data-lucide="camera" class="w-6 h-6 mb-1"></i>
+                            <span class="text-[8px] font-black uppercase">Instant</span>
+                        </div>
+                    </div>
+
+                    <!-- Note & Ambiance -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-stone-50 p-4 rounded-3xl">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center">Verdict</label>
+                            <div id="log-stars" class="flex justify-center gap-1 cursor-pointer">
+                                <i data-lucide="star" data-val="1" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
+                                <i data-lucide="star" data-val="2" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
+                                <i data-lucide="star" data-val="3" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
+                                <i data-lucide="star" data-val="4" class="w-5 h-5 text-emerald-700 fill-emerald-700 star-btn"></i>
+                                <i data-lucide="star" data-val="5" class="w-5 h-5 text-stone-200 star-btn"></i>
+                            </div>
+                        </div>
+                        <div class="bg-stone-50 p-4 rounded-3xl cursor-pointer select-none" onclick="cycleBudget()">
+                            <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 text-center cursor-pointer">Budget</label>
+                            <div class="flex justify-center gap-2">
+                                <span id="budget-display" class="text-sm font-black text-emerald-950">$$$</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Must Try -->
+                    <div>
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-stone-400 mb-3 italic underline decoration-emerald-200">Le Must-Try Absolu</label>
+                        <input type="text" placeholder="Ex: Le Mezcal Tonic..." class="w-full px-4 py-4 bg-stone-50 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-emerald-200 outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-950 text-white py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-200 active:scale-95 transition-transform">
+                        Journaliser & Gagner de l'XP
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB BAR (Navigation Mobile en bas) -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-2xl border-t border-stone-100 px-8 py-5 flex justify-between items-center z-[60] rounded-t-[3rem] shadow-[0_-15px_50px_rgba(0,0,0,0.06)] safe-area-bottom">
+            <button onclick="showPage('home')" class="nav-btn tab-active flex flex-col items-center gap-1.5 transition-all active:scale-90">
+                <i data-lucide="layout-grid" class="w-6 h-6"></i>
+                <span class="text-[8px] font-black uppercase tracking-[0.15em]">Flux</span>
+            </button>
+            <button onclick="showPage('explore')" class="nav-btn flex flex-col items-center gap-1.5 text-stone-300 transition-all active:scale-90">
+                <i data-lucide="compass" class="w-6 h-6"></i>
+                <span class="text-[8px] font-black uppercase tracking-[0.15em]">Carte</span>
+            </button>
+            
+            <!-- Bouton Central "+" -->
+            <div class="-mt-20">
+                <button id="open-log" class="bg-emerald-700 text-white p-6 rounded-full shadow-2xl shadow-emerald-200 border-[8px] border-[#FDFCF8] active:scale-90 transition-all">
+                    <i data-lucide="plus" class="w-8 h-8 stroke-[3.5px]"></i>
+                </button>
+            </div>
+
+            <button onclick="showPage('listes')" class="nav-btn flex flex-col items-center gap-1.5 text-stone-300 transition-all active:scale-90">
+                <i data-lucide="layers" class="w-6 h-6"></i>
+                <span class="text-[8px] font-black uppercase tracking-[0.15em]">Listes</span>
+            </button>
+            <button onclick="showPage('profile')" class="nav-btn flex flex-col items-center gap-1.5 text-stone-300 transition-all active:scale-90">
+                <i data-lucide="user" class="w-6 h-6"></i>
+                <span class="text-[8px] font-black uppercase tracking-[0.15em]">Moi</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- SCRIPTS POUR L'INTERACTIVITÉ -->
+    <script>
+        // 2. Initialiser la connexion Supabase (en haut des scripts)
+        const supabaseUrl = 'https://tevuyezitutsljuawnve.supabase.co';
+        const supabaseKey = 'sb_publishable_vp8_66K1QaclvIBB3Su1hw_5jMLuMtO';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Initialisation de la Carte Interactive (Leaflet)
+        let map;
+        let markersLayer;
+
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([48.86, 2.38], 13);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+            markersLayer = L.featureGroup().addTo(map);
+        }
+        initMap();
+
+        // 1. Initialisation des icônes
+        lucide.createIcons();
+
+        // 2. Gestion des Pages (Navigation)
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            setTimeout(() => {
+                document.getElementById('page-' + pageId).classList.add('active');
+                
+                // Rafraîchir la taille de la carte si on affiche l'onglet Explorer
+                if (pageId === 'explore' && map) {
+                    map.invalidateSize();
+                }
+            }, 50);
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-emerald-700');
+                btn.classList.add('text-stone-300');
+                btn.querySelector('i').setAttribute('stroke-width', '2');
+            });
+            
+            const eventBtn = window.event?.currentTarget;
+            if (eventBtn && eventBtn.classList.contains('nav-btn')) {
+                eventBtn.classList.add('tab-active');
+                eventBtn.querySelector('i').setAttribute('stroke-width', '3');
+            }
+        }
+
+        // 3. Système de Notifications (Toasts)
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 4. Gestion de la Modal "+" (Le Formulaire)
+        const openLogBtn = document.getElementById('open-log');
+        const closeLogBtn = document.getElementById('close-log');
+        const overlay = document.getElementById('log-overlay');
+        const modal = document.getElementById('log-modal');
+
+        openLogBtn.onclick = () => {
+            overlay.classList.remove('pointer-events-none');
+            overlay.classList.add('opacity-100');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeModal = () => {
+            overlay.classList.add('pointer-events-none');
+            overlay.classList.remove('opacity-100');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        closeLogBtn.onclick = closeModal;
+        overlay.onclick = (e) => { if (e.target === overlay) closeModal(); };
+
+        // 5. Bouton "Like" (Coeur) interactif
+        document.querySelectorAll('.interact-btn').forEach(btn => {
+            btn.onclick = function() {
+                this.classList.toggle('text-rose-500');
+                this.classList.toggle('text-stone-300');
+                const span = this.querySelector('span');
+                if (span) {
+                    const currentVal = parseInt(span.innerText);
+                    span.innerText = currentVal + (this.classList.contains('text-rose-500') ? 1 : -1);
+                }
+                if (this.classList.contains('text-rose-500')) {
+                    showToast("Ajouté aux favoris !");
+                }
+            }
+        });
+
+        // 6. Étoiles de notation interactives
+        const starBtns = document.querySelectorAll('.star-btn');
+        starBtns.forEach(star => {
+            star.onclick = function() {
+                const val = parseInt(this.getAttribute('data-val'));
+                starBtns.forEach(s => {
+                    const sVal = parseInt(s.getAttribute('data-val'));
+                    if (sVal <= val) {
+                        s.classList.add('text-emerald-700', 'fill-emerald-700');
+                        s.classList.remove('text-stone-200');
+                    } else {
+                        s.classList.remove('text-emerald-700', 'fill-emerald-700');
+                        s.classList.add('text-stone-200');
+                    }
+                });
+            }
+        });
+
+        // 7. Sélecteur de Budget Interactif
+        const budgetDisplay = document.getElementById('budget-display');
+        const budgets = ["$", "$$", "$$$"];
+        let currentBudgetIndex = 2; // Par défaut sur $$$
+        function cycleBudget() {
+            currentBudgetIndex = (currentBudgetIndex + 1) % budgets.length;
+            budgetDisplay.innerText = budgets[currentBudgetIndex];
+        }
+
+        // 8. Soumission du Formulaire Connectée à Supabase
+        document.getElementById('log-form').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const spotName = this.querySelector('input[placeholder="Nom de l\'établissement..."]').value;
+            const mustTry = this.querySelector('input[placeholder="Ex: Le Mezcal Tonic..."]').value;
+
+            if (supabaseUrl === 'https://TON_PROJET.supabase.co') {
+                showToast("Formulaire simulé (clés manquantes) ! +20 XP 🔥");
+                setTimeout(closeModal, 800);
+                this.reset();
+                return;
+            }
+
+            const { data, error } = await supabaseClient
+                .from('logs')
+                .insert([
+                    { 
+                        spot_name: spotName, 
+                        must_try: mustTry,
+                        budget: currentBudgetIndex + 1, 
+                        xp_earned: 20
+                    }
+                ]);
+
+            if (!error) {
+                showToast("Enregistré dans le Cloud ! +20 XP 🔥");
+                setTimeout(closeModal, 800);
+                this.reset();
+                fetchSpots(); 
+            } else {
+                showToast("Erreur lors de l'enregistrement...");
+                console.error(error);
+            }
+        };
+
+        // 9. Quêtes interactives
+        function toggleQuest(btn) {
+            if (btn.innerText === "LANCER LA QUÊTE") {
+                btn.innerText = "QUÊTE EN COURS...";
+                btn.classList.remove('bg-stone-900', 'text-white');
+                btn.classList.add('bg-emerald-100', 'text-emerald-800');
+                showToast("Quête démarrée ! Bonne flânerie.");
+            } else {
+                btn.innerText = "LANCER LA QUÊTE";
+                btn.classList.add('bg-stone-900', 'text-white');
+                btn.classList.remove('bg-emerald-100', 'text-emerald-800');
+            }
+        }
+
+        // Fonction pour centrer la carte depuis le journal
+        function viewOnMap(lat, lng) {
+            showPage('explore');
+            setTimeout(() => {
+                map.setView([lat, lng], 16);
+            }, 100);
+        }
+
+        // 10. "Remplir" le Flux dynamiquement
+        async function fetchSpots() {
+            const feed = document.getElementById('activity-feed');
+
+            if (supabaseUrl === 'https://TON_PROJET.supabase.co') {
+                feed.innerHTML = '<p class="text-sm text-stone-400 text-center italic py-10">Remplace TON_PROJET et tes clés dans le code pour voir tes spots !</p>';
+                return;
+            }
+
+            const { data: spots, error } = await supabaseClient
+                .from('spots') 
+                .select('*');
+
+            feed.innerHTML = '';
+
+            if (spots && spots.length > 0) {
+                markersLayer.clearLayers();
+
+                spots.forEach(spot => {
+                    feed.innerHTML += `
+                        <div class="bg-white rounded-[2.5rem] p-5 border border-stone-100 shadow-sm">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center font-bold text-emerald-800">${spot.name ? spot.name[0] : '?'}</div>
+                                <div>
+                                    <h4 class="text-sm font-black text-stone-900">${spot.name || 'Nom inconnu'}</h4>
+                                    <span class="text-[9px] text-stone-400 font-bold uppercase">${spot.category || 'Spot'}</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-stone-600 italic mb-4">"${spot.address || 'Adresse introuvable'}"</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-emerald-700 font-black">${spot.price_level || '$$'}</span>
+                                <button onclick="viewOnMap(${spot.lat || 48.8566}, ${spot.lng || 2.3522})" class="text-[10px] font-black uppercase bg-stone-100 text-stone-600 px-3 py-1 rounded-full active:scale-95 transition-transform">Voir sur la carte</button>
+                            </div>
+                        </div>
+                    `;
+
+                    if (spot.lat && spot.lng) {
+                        const marker = L.marker([spot.lat, spot.lng]).bindPopup(`
+                            <div class="text-center p-1">
+                                <h4 class="text-sm font-black text-stone-900 leading-tight mb-1">${spot.name}</h4>
+                                <span class="text-[9px] text-stone-500 font-bold uppercase">${spot.category || 'Spot'} • ${spot.rating || 'N/A'}★</span>
+                            </div>
+                        `);
+                        markersLayer.addLayer(marker);
+                    }
+                });
+
+                if (markersLayer.getLayers().length > 0) {
+                    map.fitBounds(markersLayer.getBounds(), { padding: [30, 30] });
+                }
+            } else {
+                feed.innerHTML = '<p class="text-sm text-stone-400 text-center italic py-10">Aucun spot dans la base de données pour le moment.</p>';
+            }
+        }
+
+        // Appeler la fonction au chargement
+        fetchSpots();
+
+    </script>
+</body>
+</html>
+
+Flanr carte.html
+Affichage de Flanr carte.html en cours...
